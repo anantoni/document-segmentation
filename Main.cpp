@@ -59,8 +59,30 @@ void __fastcall TMainForm::Exit1Click(TObject *Sender) {
 //---------------------------------------------------------------------------
 
 void __fastcall TMainForm::Lines1Click(TObject *Sender) {
+    ImagXpress7_1->FileName = OpenDialog->FileName;
+        Ix = ImagXpress7_1->IWidth;
+        Iy = ImagXpress7_1->IHeight;
 
-    unsigned char *IMAGE = &this->IMAGE[offs];
+        output = ImagXpress7_1->FileName + ".dat";
+        ImagXpress7_1->ColorDepth(8, IPAL_Fixed, 0);
+        //ImagXpress7_1->ZoomToFit(2);
+        ImagXpress7_1->SaveToBuffer = true;
+        ImagXpress7_1->SaveFileType = FT_TIFF;
+        ImagXpress7_1->SaveFile();
+
+        HANDLE hIM = (HANDLE)ImagXpress7_1->SaveBufferHandle;
+        if (IMAGE != NULL) {
+           GlobalFree(IMAGE);
+           IMAGE=NULL;
+        }
+        
+        IMAGE = (unsigned char *)GlobalLock(hIM);
+        long ln = GlobalSize(hIM);
+        offs = ln-(long)Ix*Iy;
+        GlobalUnlock(hIM);
+        text = "[" + ExtractFileName(ImagXpress7_1->FileName) + ", " + Ix + "x" + Iy + "@" + ImagXpress7_1->IBPP + "bpp]";
+        StatusBar->SimpleText = text;
+    //unsigned char *IMAGE = &this->IMAGE[offs];
 
     /** Initialize all starting values to 0 **/
     int *values = new int[Ix*Iy];
@@ -123,8 +145,8 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
           }
           white_valley = y;
 
-          int midean = white_valley + (black_valley - white_valley)/2;
-          if (black_valley - white_valley >= y_valley_threshold) {
+          int midean = black_valley + (white_valley - black_valley)/2;
+          if (white_valley - black_valley >= y_valley_threshold) {
              horizontal_cuts.push_back(midean);
           }
     }
@@ -133,21 +155,25 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
     if(horizontal_cuts.size() < 2) {
         return;
     }
-    //assign tags to each region
-    for(int i = 0, tag = 1; i < horizontal_cuts.size() - 1; ++i, ++tag) {
+
+    int colour = 190;
+    for(int i = 0; i < horizontal_cuts.size() - 1; ++i) {
+        colour--;
         for(int y = horizontal_cuts[i]; y < horizontal_cuts[i+1]; ++y) {
             for(int x = 0; x < Ix; ++x) {
-                if(IMAGE[y*Ix+x] != 0) {
-                    IMAGE[y*Ix+x] = (values[y*Ix+x] = tag);
+                if(IMAGE[y*Ix+x] == 0) {
+                    IMAGE[y*Ix+x] = (values[y*Ix+x] = colour);
                 }
             }
         }
     }
     
     FILE *fp = fopen(output.c_str(), "wb+");
-    for(int y = 0; y < Iy; ++y)
-            for(int x = 0; x < Ix; ++x)
-                    fwrite(&values[y*Ix+x], 1, sizeof(int), fp);
+    for(int y = 0; y < Iy; ++y) {
+        for(int x = 0; x < Ix; ++x) {
+            fwrite(&values[y*Ix+x], 1, sizeof(int), fp);
+        }
+    }
     fclose(fp);
 
     delete[] values;
@@ -163,19 +189,34 @@ void __fastcall TMainForm::ImagXpress7_1MouseMove(TObject *Sender, TShiftState S
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::Words1Click(TObject *Sender)
 {
+    ImagXpress7_1->FileName = OpenDialog->FileName;
+    Ix = ImagXpress7_1->IWidth;
+    Iy = ImagXpress7_1->IHeight;
 
-    unsigned char *IMAGE = &this->IMAGE[offs];
+    output = ImagXpress7_1->FileName + ".dat";
+    ImagXpress7_1->ColorDepth(8, IPAL_Fixed, 0);
+    //ImagXpress7_1->ZoomToFit(2);
+    ImagXpress7_1->SaveToBuffer = true;
+    ImagXpress7_1->SaveFileType = FT_TIFF;
+    ImagXpress7_1->SaveFile();
 
-    int *values = new int[Ix*Iy];
-    for(int i = 0; i < Ix*Iy; ++i) {
-        values[i] = 0;
+    HANDLE hIM = (HANDLE)ImagXpress7_1->SaveBufferHandle;
+    if (IMAGE != NULL) {
+       GlobalFree(IMAGE);
+       IMAGE=NULL;
     }
 
-    //flip colors
-    for(int y = 0; y < Iy; ++y) {
-        for(int x = 0; x < Ix; ++x) {
-            //IMAGE[y*Ix+x] = IMAGE[y*Ix+x] ? 0 : 255;
-        }
+    IMAGE = (unsigned char *)GlobalLock(hIM);
+    long ln = GlobalSize(hIM);
+    offs = ln-(long)Ix*Iy;
+    GlobalUnlock(hIM);
+    text = "[" + ExtractFileName(ImagXpress7_1->FileName) + ", " + Ix + "x" + Iy + "@" + ImagXpress7_1->IBPP + "bpp]";
+    StatusBar->SimpleText = text;
+    //unsigned char *IMAGE = &this->IMAGE[offs];
+
+    int *values_to_write = new int[Ix*Iy];
+    for(int i = 0; i < Ix*Iy; ++i) {
+        values_to_write[i] = 0;
     }
 
     //y-axis histogram
@@ -219,21 +260,21 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
     return;
     int tag = 1;
     for(int i = 0; i < horizontal_cuts.size() - 1; ++i)
-    MainForm->words(horizontal_cuts[i], horizontal_cuts[i+1], tag, values);
+    MainForm->words(horizontal_cuts[i], horizontal_cuts[i+1], tag, values_to_write);
 
 
     FILE *fp = fopen(output.c_str(), "wb+");
     for(int y = 0; y < Iy; ++y)
     for(int x = 0; x < Ix; ++x)
-    fwrite(&values[y*Ix+x], 1, sizeof(int), fp);
+    fwrite(&values_to_write[y*Ix+x], 1, sizeof(int), fp);
     fclose(fp);
 
-    delete[] values;
+    delete[] values_to_write;
     ImagXpress7_1->DIBUpdate();
     ImagXpress7_1->LoadBuffer((long) this->IMAGE);
 }
-//---------------------------------------------------------------------------
-void TMainForm::words(int ys, int ye, int& tag, int* values){
+
+void TMainForm::words(int ys, int ye, int& tag, int* values_to_write){
     int *x_axis_hist = new int[Ix];
     long sum = 0, count = 0;
     int x_axis_threshold;
@@ -275,7 +316,7 @@ void TMainForm::words(int ys, int ye, int& tag, int* values){
         for(int x = x_cuts[i]; x < x_cuts[i+1]; ++x) {
             for(int y = ys; y < ye; ++y) {
                 if(IMAGE[offs+y*Ix+x] != 0) {
-                    IMAGE[offs+y*Ix+x] = (values[y*Ix+x] = tag);
+                    IMAGE[offs+y*Ix+x] = (values_to_write[y*Ix+x] = tag);
                 }
             }
         }
