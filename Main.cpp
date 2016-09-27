@@ -90,11 +90,11 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
         values[i] = 0;
     }
 
-      //flip colors
-    for(int y=0; y<Iy; ++y)
+    //flip colors
+    /*for(int y=0; y<Iy; ++y)
         for(int x=0; x<Ix; ++x)
             IMAGE[y*Ix+x] = IMAGE[y*Ix+x] ? 0 : 255;
-
+     */
 
     /**
     *
@@ -113,7 +113,7 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
         horizontal_histogram[y] = 0;
 
         for(int x = 0; x < Ix; ++x) {
-            if(IMAGE[y*Ix+x] != 0) {
+            if(IMAGE[y*Ix+x] == 0) {
                 ++horizontal_histogram[y];
             }
         }
@@ -134,18 +134,18 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
 
     int y = 0;
     while (y < Iy) {
-        while (y < Iy && horizontal_histogram[y] == 0) {
+        while (y < Iy && horizontal_histogram[y] != 0) {
             y++;
         }
         int black_valley = y;
 
-        while (y < Iy && horizontal_histogram[y] != 0) {
+        while (y < Iy && horizontal_histogram[y] == 0) {
             y++;
         }
         int white_valley = y;
 
         int midean = black_valley + (white_valley - black_valley)/2;
-        if (white_valley - black_valley >= (float)y_valley_threshold*Iy/100.0) {
+        if (white_valley - black_valley >= (float)y_valley_threshold*Ix/100.0) {
             horizontal_cuts.push_back(midean);
         }
     }
@@ -159,7 +159,7 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
     for(int i = 0; i < horizontal_cuts.size() - 1; ++i) {
         for(int y = horizontal_cuts[i]; y < horizontal_cuts[i+1]; ++y) {
             for(int x = 0; x < Ix; ++x) {
-                    if(IMAGE[y*Ix+x] != 0) {
+                    if(IMAGE[y*Ix+x] == 0) {
                         IMAGE[y*Ix+x] = (values[y*Ix+x] = colour);
                     }
             }
@@ -219,14 +219,6 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
         values_to_write[i] = 0;
     }
 
-      //flip colors
-    for(int y=0; y<Iy; ++y)
-        for(int x=0; x<Ix; ++x)
-             IMAGE[y*Ix+x] = IMAGE[y*Ix+x] ? 0 : 255;
-
-    /**
-    *
-    */
     int *horizontal_histogram;
     float y_valley_threshold = StrToFloat(yAxisValleyHeightThreshold->Text);
 
@@ -241,7 +233,7 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
         horizontal_histogram[y] = 0;
 
         for(int x = 0; x < Ix; ++x) {
-            if(IMAGE[y*Ix+x] != 0) {
+            if(IMAGE[y*Ix+x] == 0) {
                 ++horizontal_histogram[y];
             }
         }
@@ -261,17 +253,17 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
 
     int y = 0;
     while (y < Iy) {
-        while (y < Iy && horizontal_histogram[y] == 0)
+        while (y < Iy && horizontal_histogram[y] != 0)
             y++;
         int black_valley = y;
 
-        while (y < Iy && horizontal_histogram[y] != 0)
+        while (y < Iy && horizontal_histogram[y] == 0)
             y++;
         int white_valley = y;
 
         int midean = black_valley + (white_valley - black_valley)/2;
         
-        if (white_valley - black_valley >= (y_valley_threshold * (float)Iy)/100.0) {
+        if (white_valley - black_valley >= (float)(y_valley_threshold * Ix)/100.0) {
             horizontal_cuts.push_back(midean);
         }
     }
@@ -284,7 +276,6 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
     int colour = 1;
     for(int i = 0; i < horizontal_cuts.size() - 1; ++i) {
         MainForm->words(horizontal_cuts[i], horizontal_cuts[i+1], colour, values_to_write);
-        colour++;
     }
 
     FILE *fp = fopen(output.c_str(), "wb+");
@@ -308,8 +299,8 @@ void TMainForm::words(int ys, int ye, int& colour, int* values_to_write) {
         vertical_histogram[x] = 0;
 
         for(int y = ys; y < ye; ++y) {
-            if(IMAGE[offs+y*Ix+x] != 0)
-                 vertical_histogram[x]++;
+            if(IMAGE[offs+y*Ix+x] == 0)
+                vertical_histogram[x]++;
         }
 
         sum += vertical_histogram[x];
@@ -330,14 +321,12 @@ void TMainForm::words(int ys, int ye, int& colour, int* values_to_write) {
 
     int x = 0;
     while (x < Ix) {
-        while (x < Ix && vertical_histogram[x] == 0) {
+        while (x < Ix && vertical_histogram[x] != 0)
             x++;
-        }
         int black_valley = x;
 
-        while (x < Ix && vertical_histogram[x] != 0) {
+        while (x < Ix && vertical_histogram[x] == 0)
             x++;
-        }
         int white_valley = x;
 
         int midean = black_valley + (white_valley - black_valley)/2;
@@ -352,11 +341,12 @@ void TMainForm::words(int ys, int ye, int& colour, int* values_to_write) {
     for(int i = 0; i < vertical_cuts.size()-1; ++i) {
         for(int x = vertical_cuts[i]; x < vertical_cuts[i+1]; ++x) {
             for(int y = ys; y < ye; ++y) {
-                if(IMAGE[offs+y*Ix+x] != 0) {
+                if(IMAGE[offs+y*Ix+x] == 0) {
                     IMAGE[offs+y*Ix+x] = (values_to_write[y*Ix+x] = colour);
                 }
             }
         }
+        colour++;
     }
     delete[] vertical_histogram;
 }
