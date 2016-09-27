@@ -3,7 +3,7 @@ object MainForm: TMainForm
   Top = 196
   Width = 1232
   Height = 657
-  Caption = 'Text Segmentation Assignment'
+  Caption = 'Homework 6 - Text segmentation into words and lines'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -27,7 +27,7 @@ object MainForm: TMainForm
     ControlData = {
       0800420000004200310033004200300035004600460036003100330042003200
       4200390042003300300030003100300037004100420032004600390044004600
-      3800460038000000366FFC6107B823420300010000001007000076640000D73B
+      380046003800000049007766297907FC0300010000001007000076640000D73B
       000008000200000000000300040000001300C0C0C0000B00FFFF09000352E30B
       918FCE119DE300AA004BB85101A10000BC02444201000D4D532053616E732053
       6572696609000000000000000000000000000000000013000000000013000000
@@ -105,14 +105,14 @@ object MainForm: TMainForm
       Width = 57
       Height = 21
       TabOrder = 0
-      Text = '165'
+      Text = '160'
     end
     object LinesButton: TButton
       Left = 88
       Top = 176
       Width = 73
       Height = 25
-      Caption = 'Lines'
+      Caption = 'Split Lines'
       TabOrder = 1
       OnClick = LinesButtonClick
     end
@@ -122,7 +122,7 @@ object MainForm: TMainForm
       Width = 57
       Height = 21
       TabOrder = 2
-      Text = '10'
+      Text = '14'
     end
     object xAxisLineHeightThreshold: TEdit
       Left = 168
@@ -130,7 +130,7 @@ object MainForm: TMainForm
       Width = 57
       Height = 21
       TabOrder = 3
-      Text = '9'
+      Text = '14'
     end
     object xAxisValleyWidthThreshold: TEdit
       Left = 168
@@ -138,7 +138,7 @@ object MainForm: TMainForm
       Width = 57
       Height = 21
       TabOrder = 4
-      Text = '29'
+      Text = '24'
     end
     object WordsButton: TButton
       Left = 168
@@ -154,7 +154,7 @@ object MainForm: TMainForm
       Top = 48
       Width = 201
       Height = 17
-      Caption = 'select average #pixels as threshold'
+      Caption = 'Select average horizontal black pixels per line as threshold'
       TabOrder = 6
     end
     object CheckBox2: TCheckBox
@@ -162,7 +162,7 @@ object MainForm: TMainForm
       Top = 120
       Width = 209
       Height = 25
-      Caption = 'select average #pixels as threshold'
+      Caption = 'Select average vertical black pixels per line as threshold'
       TabOrder = 7
     end
   end
