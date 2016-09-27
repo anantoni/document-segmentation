@@ -335,9 +335,9 @@ void TMainForm::words(int ys, int ye, int& colour, int* values_to_write) {
         }
     }
 
-    if(vertical_cuts.size() < 2)
+    if(vertical_cuts.size() < 2) {
         return;
-
+    }
     for(int i = 0; i < vertical_cuts.size()-1; ++i) {
         for(int x = vertical_cuts[i]; x < vertical_cuts[i+1]; ++x) {
             for(int y = ys; y < ye; ++y) {
