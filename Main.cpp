@@ -360,30 +360,6 @@ void __fastcall TMainForm::WordsButtonClick(TObject *Sender)
 {
     Words1Click(Sender);
 }
-//---------------------------------------------------------------------------
-
-
-void __fastcall TMainForm::EvaluateLinesClick(TObject *Sender)
-{
-for(int i=301; i<401; ++i){
-ImagXpress7_1->FileName = "C:\\Users\\anantoni\\Documents\\eval\\IMAGEs\\" + IntToStr(i) + ".tif";
-OpenDialog->FileName = ImagXpress7_1->FileName;
-output = "C:\\Users\\anantoni\\Documents\\eval\\results\\lines\\" + IntToStr(i) + ".tif.dat";
-Lines1Click(Sender);
-}
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TMainForm::EvaluateWordsClick(TObject *Sender)
-{
-for(int i=301; i<401; ++i){
-ImagXpress7_1->FileName = "C:\\Users\\nymeria\\Documents\\eval\\IMAGEs\\" + IntToStr(i) + ".tif";
-OpenDialog->FileName = ImagXpress7_1->FileName;
-output = "C:\\Users\\nymeria\\Documents\\eval\\results\\words\\" + IntToStr(i) + ".tif.dat";
-Words1Click(Sender);
-}
-}
-//---------------------------------------------------------------------------
 
 
 
