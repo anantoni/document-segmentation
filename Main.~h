@@ -47,18 +47,18 @@ class TMainForm : public TForm
     void __fastcall Words1Click(TObject *Sender);
     void __fastcall LinesButtonClick(TObject *Sender);
     void __fastcall WordsButtonClick(TObject *Sender);
-    //   void __fastcall EvaluateLinesClick(TObject *Sender);
-    //   void __fastcall EvaluateWordsClick(TObject *Sender);
+    void __fastcall EvaluateLinesClick(TObject *Sender);
+    void __fastcall EvaluateWordsClick(TObject *Sender);
 
     private:	// User declarations
-                int Ix, Iy;
-                unsigned char *IMAGE;
-                long offs;
-                AnsiString text;
-                AnsiString output;
-                void words(int ys,int ye,int& tag,int *values);
+    int Ix, Iy;
+    unsigned char *IMAGE;
+    long offs;
+    AnsiString text;
+    AnsiString output;
+    void words(int ys,int ye,int& tag,int *values);
     public:		// User declarations
-                __fastcall TMainForm(TComponent* Owner);
+    __fastcall TMainForm(TComponent* Owner);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TMainForm *MainForm;

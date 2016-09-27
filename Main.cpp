@@ -37,10 +37,10 @@ void __fastcall TMainForm::Open1Click(TObject *Sender) {
 
         HANDLE hIM = (HANDLE)ImagXpress7_1->SaveBufferHandle;
         if (IMAGE != NULL) {
-           GlobalFree(IMAGE);
-           IMAGE=NULL;
+            GlobalFree(IMAGE);
+            IMAGE=NULL;
         }
-        
+
         IMAGE = (unsigned char *)GlobalLock(hIM);
         long ln = GlobalSize(hIM);
         offs = ln-(long)Ix*Iy;
@@ -91,14 +91,14 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
     }
 
     /**
-     *
-     */
+    *
+    */
     int *horizontal_histogram;
     int y_valley_threshold = StrToInt(yAxisValleyHeightThreshold->Text);
 
     if ((horizontal_histogram = new int[Iy]) == NULL ) {
-       cerr << "Error in y histogram allocation" << endl;
-       exit(-1);
+        cerr << "Error in y histogram allocation" << endl;
+        exit(-1);
     }
 
     long sum = 0, count = 0;
@@ -108,12 +108,12 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
 
         for(int x = 0; x < Ix; ++x) {
             if(IMAGE[y*Ix+x] == 0)
-                ++horizontal_histogram[y];
+            ++horizontal_histogram[y];
         }
 
         sum += horizontal_histogram[y];
         if (horizontal_histogram[y])
-           ++count;
+        ++count;
     }
 
     int line_width_threshold = CheckBox1->Checked ? sum/count : StrToInt(yAxisLineWidthThreshold->Text);  //minimum line height in pixels
@@ -126,28 +126,28 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
 
     int y = 0;
     while (y < Iy) {
-          int black_valley;
-          while (y < Iy && horizontal_histogram[y] == 0) {
-                y++;
-          }
-          black_valley = y;
+        int black_valley;
+        while (y < Iy && horizontal_histogram[y] == 0) {
+            y++;
+        }
+        black_valley = y;
 
-          //int midean = black_valley + (white_valley - black_valley)/2;
-          if (black_valley >= y_valley_threshold) {
-             horizontal_cuts.push_back(black_valley);
-             horizontal_cut_kinds.push_back(1);
-          }
+        //int midean = black_valley + (white_valley - black_valley)/2;
+        if (black_valley >= y_valley_threshold) {
+            horizontal_cuts.push_back(black_valley);
+            horizontal_cut_kinds.push_back(1);
+        }
 
-          int white_valley;
-          while (y < Iy && horizontal_histogram[y] != 0) {
-                y++;
-          }
-          white_valley = y;
+        int white_valley;
+        while (y < Iy && horizontal_histogram[y] != 0) {
+            y++;
+        }
+        white_valley = y;
 
-          if (white_valley >= y_valley_threshold) {
-             horizontal_cuts.push_back(white_valley);
-             horizontal_cut_kinds.push_back(0);
-          }
+        if (white_valley >= y_valley_threshold) {
+            horizontal_cuts.push_back(white_valley);
+            horizontal_cut_kinds.push_back(0);
+        }
     }
 
     delete[] horizontal_histogram;
@@ -159,18 +159,18 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
     for(int i = 0; i < horizontal_cuts.size() - 1; ++i) {
         for(int y = horizontal_cuts[i]; y < horizontal_cuts[i+1]; ++y) {
             if (horizontal_cut_kinds[i] == 1) {
-               for(int x = 0; x < Ix; ++x) {
-                   if(IMAGE[y*Ix+x] != 0) {
-                       IMAGE[y*Ix+x] = (values[y*Ix+x] = colour);
-                   }
-               }
+                for(int x = 0; x < Ix; ++x) {
+                    if(IMAGE[y*Ix+x] != 0) {
+                        IMAGE[y*Ix+x] = (values[y*Ix+x] = colour);
+                    }
+                }
             }
             else {
                 for(int x = 0; x < Ix; ++x) {
-                   if(IMAGE[y*Ix+x] != 0) {
-                       IMAGE[y*Ix+x] = (values[y*Ix+x] = 255);
-                   }
-               }
+                    if(IMAGE[y*Ix+x] != 0) {
+                        IMAGE[y*Ix+x] = (values[y*Ix+x] = 255);
+                    }
+                }
             }
         }
         //if (horizontal_cut_kinds[i] == 1)
@@ -211,8 +211,8 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
 
     HANDLE hIM = (HANDLE)ImagXpress7_1->SaveBufferHandle;
     if (IMAGE != NULL) {
-       GlobalFree(IMAGE);
-       IMAGE=NULL;
+        GlobalFree(IMAGE);
+        IMAGE=NULL;
     }
 
     IMAGE = (unsigned char *)GlobalLock(hIM);
@@ -229,14 +229,14 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
     }
 
     /**
-     *
-     */
+    *
+    */
     int *horizontal_histogram;
     int y_valley_threshold = StrToInt(yAxisValleyHeightThreshold->Text);
 
     if ((horizontal_histogram = new int[Iy]) == NULL ) {
-       cerr << "Error in y histogram allocation" << endl;
-       exit(-1);
+        cerr << "Error in y histogram allocation" << endl;
+        exit(-1);
     }
 
     long sum = 0, count = 0;
@@ -246,12 +246,12 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
 
         for(int x = 0; x < Ix; ++x) {
             if(IMAGE[y*Ix+x] == 0)
-                ++horizontal_histogram[y];
+            ++horizontal_histogram[y];
         }
 
         sum += horizontal_histogram[y];
         if (horizontal_histogram[y])
-           ++count;
+        ++count;
     }
 
     int line_width_threshold = CheckBox1->Checked ? sum/count : StrToInt(yAxisLineWidthThreshold->Text);  //minimum line height in pixels
@@ -264,28 +264,28 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
 
     int y = 0;
     while (y < Iy) {
-          int black_valley;
-          while (y < Iy && horizontal_histogram[y] == 0) {
-                y++;
-          }
-          black_valley = y;
+        int black_valley;
+        while (y < Iy && horizontal_histogram[y] == 0) {
+            y++;
+        }
+        black_valley = y;
 
-          //int midean = black_valley + (white_valley - black_valley)/2;
-          if (black_valley >= y_valley_threshold) {
-             horizontal_cuts.push_back(black_valley);
-             horizontal_cut_kinds.push_back(1);
-          }
+        //int midean = black_valley + (white_valley - black_valley)/2;
+        if (black_valley >= y_valley_threshold) {
+            horizontal_cuts.push_back(black_valley);
+            horizontal_cut_kinds.push_back(1);
+        }
 
-          int white_valley;
-          while (y < Iy && horizontal_histogram[y] != 0) {
-                y++;
-          }
-          white_valley = y;
+        int white_valley;
+        while (y < Iy && horizontal_histogram[y] != 0) {
+            y++;
+        }
+        white_valley = y;
 
-          if (white_valley >= y_valley_threshold) {
-             horizontal_cuts.push_back(white_valley);
-             horizontal_cut_kinds.push_back(0);
-          }
+        if (white_valley >= y_valley_threshold) {
+            horizontal_cuts.push_back(white_valley);
+            horizontal_cut_kinds.push_back(0);
+        }
     }
 
     delete[] horizontal_histogram;
@@ -295,7 +295,7 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
 
     int colour = 190;
     for(int i = 0; i < horizontal_cuts.size() - 1; ++i) {
-    
+
         if(horizontal_cut_kinds[i] == 1) {
             MainForm->words(horizontal_cuts[i], horizontal_cuts[i+1], colour, values_to_write);
         }
@@ -303,9 +303,9 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
             for(int y = horizontal_cuts[i]; y < horizontal_cuts[i+1]; ++y) {
                 if (horizontal_cut_kinds[i] == 1) {
                     for(int x = 0; x < Ix; ++x) {
-                       if(IMAGE[y*Ix+x] != 0) {
-                          IMAGE[y*Ix+x] = values_to_write[y*Ix+x] = colour;
-                       }
+                        if(IMAGE[y*Ix+x] != 0) {
+                            IMAGE[y*Ix+x] = values_to_write[y*Ix+x] = colour;
+                        }
                     }
                 }
 
@@ -319,7 +319,6 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
             }
         }
     }
-
 
     FILE *fp = fopen(output.c_str(), "wb+");
     for(int y = 0; y < Iy; ++y)
@@ -343,12 +342,12 @@ void TMainForm::words(int ys, int ye, int& colour, int* values_to_write) {
 
         for(int y = ys; y < ye; ++y) {
             if(IMAGE[offs+y*Ix+x] == 0)
-                vertical_histogram[x]++;
+            vertical_histogram[x]++;
         }
-        
+
         sum += vertical_histogram[x];
         if(vertical_histogram[x])
-            ++count;
+        ++count;
     }
 
     x_axis_threshold = CheckBox2->Checked ? sum/count : StrToInt(xAxisLineHeightThreshold->Text);
@@ -363,32 +362,32 @@ void TMainForm::words(int ys, int ye, int& colour, int* values_to_write) {
 
     int x = 0;
     while (x < Ix) {
-          int black_valley;
-          while (x < Ix && vertical_histogram[x] == 0) {
-                x++;
-          }
-          black_valley = x;
+        int black_valley;
+        while (x < Ix && vertical_histogram[x] == 0) {
+            x++;
+        }
+        black_valley = x;
 
-          //int midean = black_valley + (white_valley - black_valley)/2;
-          if (black_valley >= x_valley_threshold) {
-             vertical_cuts.push_back(black_valley);
-             vertical_cut_kinds.push_back(1);
-          }
+        //int midean = black_valley + (white_valley - black_valley)/2;
+        if (black_valley >= x_valley_threshold) {
+            vertical_cuts.push_back(black_valley);
+            vertical_cut_kinds.push_back(1);
+        }
 
-          int white_valley;
-          while (x < Ix && vertical_histogram[x] != 0) {
-                x++;
-          }
-          white_valley = x;
+        int white_valley;
+        while (x < Ix && vertical_histogram[x] != 0) {
+            x++;
+        }
+        white_valley = x;
 
-          if (white_valley >= x_valley_threshold) {
-             vertical_cuts.push_back(white_valley);
-             vertical_cut_kinds.push_back(0);
-          }
+        if (white_valley >= x_valley_threshold) {
+            vertical_cuts.push_back(white_valley);
+            vertical_cut_kinds.push_back(0);
+        }
     }
 
     if(vertical_cuts.size() < 2)
-        return;
+    return;
 
     for(int i = 0; i < vertical_cuts.size()-1; ++i) {
         if (vertical_cut_kinds[i] == 1) {
@@ -424,13 +423,13 @@ void __fastcall TMainForm::WordsButtonClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-/*
+
 void __fastcall TMainForm::EvaluateLinesClick(TObject *Sender)
 {
 for(int i=301; i<401; ++i){
-ImagXpress7_1->FileName = "C:\\Users\\ek\\Desktop\\eval\\IMAGEs\\" + IntToStr(i) + ".tif";
+ImagXpress7_1->FileName = "C:\\Users\\anantoni\\Documents\\eval\\IMAGEs\\" + IntToStr(i) + ".tif";
 OpenDialog->FileName = ImagXpress7_1->FileName;
-output = "C:\\Users\\ek\\Desktop\\eval\\results\\lines\\" + IntToStr(i) + ".tif.dat";
+output = "C:\\Users\\anantoni\\Documents\\eval\\results\\lines\\" + IntToStr(i) + ".tif.dat";
 Lines1Click(Sender);
 }
 }
@@ -439,14 +438,22 @@ Lines1Click(Sender);
 void __fastcall TMainForm::EvaluateWordsClick(TObject *Sender)
 {
 for(int i=301; i<401; ++i){
-ImagXpress7_1->FileName = "C:\\Users\\ek\\Desktop\\eval\\IMAGEs\\" + IntToStr(i) + ".tif";
+ImagXpress7_1->FileName = "C:\\Users\\nymeria\\Documents\\eval\\IMAGEs\\" + IntToStr(i) + ".tif";
 OpenDialog->FileName = ImagXpress7_1->FileName;
-output = "C:\\Users\\ek\\Desktop\\eval\\results\\words\\" + IntToStr(i) + ".tif.dat";
+output = "C:\\Users\\nymeria\\Documents\\eval\\results\\words\\" + IntToStr(i) + ".tif.dat";
 Words1Click(Sender);
 }
 }
 //---------------------------------------------------------------------------
-*/
+
+
+
+
+
+
+
+
+
 
 
 

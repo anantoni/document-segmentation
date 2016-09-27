@@ -27,7 +27,7 @@ object MainForm: TMainForm
     ControlData = {
       0800420000004200310033004200300035004600460036003100330042003200
       4200390042003300300030003100300037004100420032004600390044004600
-      3800460038000000151FC373633207400300010000001007000076640000D73B
+      3800460038000000366FFC6107B823420300010000001007000076640000D73B
       000008000200000000000300040000001300C0C0C0000B00FFFF09000352E30B
       918FCE119DE300AA004BB85101A10000BC02444201000D4D532053616E732053
       6572696609000000000000000000000000000000000013000000000013000000
@@ -74,30 +74,30 @@ object MainForm: TMainForm
     object Label1: TLabel
       Left = 16
       Top = 24
-      Width = 133
+      Width = 101
       Height = 13
-      Caption = 'Y-Axis Line Width Threshold'
+      Caption = 'Line Width Threshold'
     end
     object Label2: TLabel
       Left = 16
       Top = 72
-      Width = 144
+      Width = 112
       Height = 13
-      Caption = 'Y-Axis Valley Height Threshold'
+      Caption = 'Valley Height Threshold'
     end
     object Label3: TLabel
       Left = 16
       Top = 96
-      Width = 136
+      Width = 104
       Height = 13
-      Caption = 'X-Axis Line Height Threshold'
+      Caption = 'Line Height Threshold'
     end
     object Label4: TLabel
       Left = 16
       Top = 144
-      Width = 141
+      Width = 109
       Height = 13
-      Caption = 'X-Axis Valley Width Threshold'
+      Caption = 'Valley Width Threshold'
     end
     object yAxisLineWidthThreshold: TEdit
       Left = 168
@@ -161,7 +161,7 @@ object MainForm: TMainForm
       Left = 16
       Top = 120
       Width = 209
-      Height = 17
+      Height = 25
       Caption = 'select average #pixels as threshold'
       TabOrder = 7
     end
