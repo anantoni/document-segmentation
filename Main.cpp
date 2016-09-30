@@ -15,6 +15,9 @@ TMainForm *MainForm;
 #include<stdio.h>
 #include<stdlib.h>
 #include<iostream>
+#include<math.h>
+#include<string.h>
+#include<sstream>
 using namespace std;
 //---------------------------------------------------------------------------
 __fastcall TMainForm::TMainForm(TComponent* Owner) : TForm(Owner) {
@@ -385,5 +388,81 @@ void __fastcall TMainForm::EvaluateWordsClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
 {
-  printf("Test test.\n");
+    ImagXpress7_1->FileName = OpenDialog->FileName;
+    Ix = ImagXpress7_1->IWidth;
+    Iy = ImagXpress7_1->IHeight;
+
+    //output = ImagXpress7_1->FileName + ".dat";
+    ImagXpress7_1->ColorDepth(8, IPAL_Fixed, 0);
+    //ImagXpress7_1->ZoomToFit(2);
+    ImagXpress7_1->SaveToBuffer = true;
+    ImagXpress7_1->SaveFileType = FT_TIFF;
+    ImagXpress7_1->SaveFile();
+
+    HANDLE hIM = (HANDLE)ImagXpress7_1->SaveBufferHandle;
+    if (IMAGE != NULL) {
+        GlobalFree(IMAGE);
+        IMAGE=NULL;
+    }
+
+    IMAGE = (unsigned char *)GlobalLock(hIM);
+    long ln = GlobalSize(hIM);
+    offs = ln-(long)Ix*Iy;
+    GlobalUnlock(hIM);
+    text = "[" + ExtractFileName(ImagXpress7_1->FileName) + ", " + Ix + "x" + Iy + "@" + ImagXpress7_1->IBPP + "bpp]";
+    StatusBar->SimpleText = text;
+    unsigned char *IMAGE = &this->IMAGE[offs];
+
+    /** Initialize all starting values to write to data file to 0 **/
+    int *values_to_write = new int[Ix*Iy];
+    for(int i = 0; i < Ix*Iy; ++i) {
+        values_to_write[i] = 0;
+    }
+
+    int **horizontal_histogram;
+    float y_valley_threshold = StrToFloat(yAxisValleyHeightThreshold->Text);
+
+    if ((horizontal_histogram = new int*[Iy]) == NULL ) {
+        cerr << "Error in y histogram allocation" << endl;
+        exit(-1);
+    }
+
+    for (int i = 0; i < Iy; i++)
+        horizontal_histogram[i] = new int[20];
+
+   int chunk_size = floor((float)Ix/20.0);
+   int integer_width_covered = 20 * chunk_size;
+   int final_chunk_size = Ix - integer_width_covered;
+
+   /** Generate projection profiles for chunks **/
+   for (int i = 0; i < Iy; i++) {
+       for (int chunk_no = 0; chunk_no < 20; chunk_no++) {
+           horizontal_histogram[i][chunk_no] = 0;
+           int start = chunk_no * chunk_size;
+           int end;
+           if (chunk_no < 19)
+               end = start + chunk_size - 1;
+           else
+               end = start + final_chunk_size - 1;
+
+           for (int j = start; j < end; j++) {
+               if (IMAGE[i * Ix + j] == 0)
+                 horizontal_histogram[i][chunk_no] += 1;
+           }
+       }
+   }
+
+   int* smoothed_projection_profiles;
+   if ((smoothed_projection_profiles = new int[Iy]) == NULL ) {
+        cerr << "Error in y histogram allocation" << endl;
+        exit(-1);
+    }
+
+    for (int i = 0; i < Iy; i++)
+        for (int j = 0; j < 5; j++)
+            smoothed_projection_profiles[i] = horizontal_histogram[i][j];
+
+
+
+
 }
