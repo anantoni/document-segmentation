@@ -104,13 +104,11 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
     */
     int *horizontal_histogram;
     int y_valley_threshold = StrToFloat(yAxisValleyHeightThreshold->Text);
-
+    int sum = 0, count = 0;
     if ((horizontal_histogram = new int[Iy]) == NULL ) {
         cerr << "Error in y histogram allocation" << endl;
         exit(-1);
     }
-
-    long sum = 0, count = 0;
 
     for(int y = 0; y < Iy; ++y) {
         horizontal_histogram[y] = 0;
@@ -120,10 +118,9 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
                 ++horizontal_histogram[y];
             }
         }
-
         sum += horizontal_histogram[y];
-        if (horizontal_histogram[y])
-        ++count;
+        if (horizontal_histogram[y] > 0)
+           count++;
     }
 
     int line_width_threshold = CheckBox1->Checked ? sum/count : StrToFloat(yAxisLineWidthThreshold->Text);  //minimum line height in pixels
@@ -371,7 +368,8 @@ void __fastcall TMainForm::EvaluateLinesClick(TObject *Sender)
                 ImagXpress7_1->FileName = "C:\\Users\\nymeria\\Documents\\evaluation\\images\\" + IntToStr(i) + ".tif";
                 OpenDialog->FileName = ImagXpress7_1->FileName;
                 output = "C:\\Users\\nymeria\\Documents\\evaluation\\results\\lines\\" + IntToStr(i) + ".tif.dat";
-                Lines1Click(Sender);
+                //Lines1Click(Sender);
+                SplitLinesNewClick(Sender);
         }
 }
 //---------------------------------------------------------------------------
@@ -392,7 +390,7 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
     Ix = ImagXpress7_1->IWidth;
     Iy = ImagXpress7_1->IHeight;
 
-    //output = ImagXpress7_1->FileName + ".dat";
+    //output = "C:\\Users\\nymeria\\Documents\\evaluation\\results\\words\\" + ImagXpress7_1->FileName + ".dat";
     ImagXpress7_1->ColorDepth(8, IPAL_Fixed, 0);
     //ImagXpress7_1->ZoomToFit(2);
     ImagXpress7_1->SaveToBuffer = true;
@@ -438,8 +436,8 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
    for (int i = 0; i < Iy; i++) {
        for (int chunk_no = 0; chunk_no < 20; chunk_no++) {
            horizontal_histogram[i][chunk_no] = 0;
-           int start = chunk_no * chunk_size;
-           int end;
+           int start = chunk_no * chunk_size, end;
+
            if (chunk_no < 19)
                end = start + chunk_size - 1;
            else
@@ -460,9 +458,63 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
 
     for (int i = 0; i < Iy; i++)
         for (int j = 0; j < 5; j++)
-            smoothed_projection_profiles[i] = horizontal_histogram[i][j];
+            smoothed_projection_profiles[i] += horizontal_histogram[i][j];
 
+    /**for (int i = 0; i < Iy; i++) {
+        for (int j = 0; j < smoothed_projection_profiles[i]; j++)
+            IMAGE[i* Ix + j] = 0;
+    }  **/
 
+    float line_width_threshold = StrToFloat(yAxisLineWidthThreshold->Text);
+    float line_pixel_threshold = (line_width_threshold*Ix)/100.0;
+    for(int y = 0; y < Iy; ++y) {
+        smoothed_projection_profiles[y] = (smoothed_projection_profiles[y] >= line_pixel_threshold);
+    }
 
+    /*for (int i = 0; i < Iy; i++) {
+        if (smoothed_projection_profiles[i] == 1)
+           for (int j = 0; j < 100; j++)
+            IMAGE[i* Ix + j] = 0;
+    }*/
+    
+    vector<int> peak_vector, valley_vector;
+    int i = 0;
+    while (i < Iy-1) {                  
+        while (smoothed_projection_profiles[i] == 1)
+              i++;
+        int peak = i;
+        peak_vector.push_back(peak);
 
+        while (smoothed_projection_profiles[i] == 0)
+              i++;
+        if (i + 1 < Iy) {
+            int valley = i+1;
+            valley_vector.push_back(valley);
+        }
+
+    }
+
+    int colour = 1;
+    for(int i = 0; i < valley_vector.size()-1; ++i) {
+        for(int x = valley_vector[i]; x < valley_vector[i+1]; ++x) {
+            for(int y = 0; y < /*5 * chunk_size*/Ix; ++y) {
+                if(IMAGE[x*Ix+y] == 0) {
+                    IMAGE[x*Ix+y] = (values_to_write[x*Ix+y] = colour);
+                }
+            }
+        }
+        colour++;
+    }
+
+    FILE *fp = fopen(output.c_str(), "wb+");
+    for(int y = 0; y < Iy; ++y) {
+        for(int x = 0; x < Ix; ++x) {
+            fwrite(&values_to_write[y*Ix+x], 1, sizeof(int), fp);
+        }
+    }
+    fclose(fp);
+
+    delete[] values_to_write;
+    ImagXpress7_1->DIBUpdate();
+    ImagXpress7_1->LoadBuffer((long) this->IMAGE);
 }
