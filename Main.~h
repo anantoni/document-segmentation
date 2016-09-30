@@ -49,6 +49,7 @@ class TMainForm : public TForm
     void __fastcall WordsButtonClick(TObject *Sender);
     void __fastcall EvaluateLinesClick(TObject *Sender);
     void __fastcall EvaluateWordsClick(TObject *Sender);
+    void __fastcall SplitLinesNewClick(TObject *Sender);
     private:	// User declarations
     int Ix, Iy;
     unsigned char *IMAGE;

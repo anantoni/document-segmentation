@@ -192,7 +192,7 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
     Ix = ImagXpress7_1->IWidth;
     Iy = ImagXpress7_1->IHeight;
 
-    output = ImagXpress7_1->FileName + ".dat";
+    //output = ImagXpress7_1->FileName + ".dat";
     ImagXpress7_1->ColorDepth(8, IPAL_Fixed, 0);
     //ImagXpress7_1->ZoomToFit(2);
     ImagXpress7_1->SaveToBuffer = true;
@@ -383,13 +383,7 @@ void __fastcall TMainForm::EvaluateWordsClick(TObject *Sender)
         }
 }
 //---------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
+void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
+{
+  printf("Test test.\n");
+}
