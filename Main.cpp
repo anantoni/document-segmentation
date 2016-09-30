@@ -62,7 +62,7 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
     Ix = ImagXpress7_1->IWidth;
     Iy = ImagXpress7_1->IHeight;
 
-    output = ImagXpress7_1->FileName + ".dat";
+    //output = ImagXpress7_1->FileName + ".dat";
     ImagXpress7_1->ColorDepth(8, IPAL_Fixed, 0);
     //ImagXpress7_1->ZoomToFit(2);
     ImagXpress7_1->SaveToBuffer = true;
@@ -360,8 +360,29 @@ void __fastcall TMainForm::WordsButtonClick(TObject *Sender)
 {
     Words1Click(Sender);
 }
+//---------------------------------------------------------------------------
+//C:\Users\nymeria\Documents\evaluation
+void __fastcall TMainForm::EvaluateLinesClick(TObject *Sender)
+{
+        for(int i=101; i<301; ++i){
+                ImagXpress7_1->FileName = "C:\\Users\\nymeria\\Documents\\evaluation\\images\\" + IntToStr(i) + ".tif";
+                OpenDialog->FileName = ImagXpress7_1->FileName;
+                output = "C:\\Users\\nymeria\\Documents\\evaluation\\results\\lines\\" + IntToStr(i) + ".tif.dat";
+                Lines1Click(Sender);
+        }
+}
+//---------------------------------------------------------------------------
 
-
+void __fastcall TMainForm::EvaluateWordsClick(TObject *Sender)
+{
+        for(int i=101; i<301; ++i){
+                ImagXpress7_1->FileName = "C:\\Users\\nymeria\\Documents\\evaluation\\images\\" + IntToStr(i) + ".tif";
+                OpenDialog->FileName = ImagXpress7_1->FileName;
+                output = "C:\\Users\\nymeria\\Documents\\evaluation\\results\\words\\" + IntToStr(i) + ".tif.dat";
+                Words1Click(Sender);
+        }
+}
+//---------------------------------------------------------------------------
 
 
 

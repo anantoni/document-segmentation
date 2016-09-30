@@ -1,7 +1,7 @@
 object MainForm: TMainForm
   Left = 1180
   Top = 196
-  Width = 1232
+  Width = 1321
   Height = 657
   Caption = 'Assignment 6 - Text segmentation into words and lines'
   Color = clBtnFace
@@ -17,7 +17,7 @@ object MainForm: TMainForm
   object ImagXpress7_1: TImagXpress7_
     Left = 0
     Top = 0
-    Width = 972
+    Width = 1061
     Height = 579
     ParentColor = False
     ParentFont = False
@@ -27,7 +27,7 @@ object MainForm: TMainForm
     ControlData = {
       0800420000004200310033004200300035004600460036003100330042003200
       4200390042003300300030003100300037004100420032004600390044004600
-      3800460038000000D100826DD21C78A20300010000001007000076640000D73B
+      3800460038000000E3438436DFC83B5A03000100000010070000A86D0000D73B
       000008000200000000000300040000001300C0C0C0000B00FFFF09000352E30B
       918FCE119DE300AA004BB85101A10000BC02444201000D4D532053616E732053
       6572696609000000000000000000000000000000000013000000000013000000
@@ -58,13 +58,13 @@ object MainForm: TMainForm
   object StatusBar: TStatusBar
     Left = 0
     Top = 579
-    Width = 1216
+    Width = 1305
     Height = 19
     Panels = <>
     SimplePanel = False
   end
   object Settings: TGroupBox
-    Left = 972
+    Left = 1061
     Top = 0
     Width = 244
     Height = 579
@@ -105,7 +105,7 @@ object MainForm: TMainForm
       Width = 57
       Height = 21
       TabOrder = 0
-      Text = '160'
+      Text = '6'
     end
     object LinesButton: TButton
       Left = 88
@@ -122,7 +122,7 @@ object MainForm: TMainForm
       Width = 57
       Height = 21
       TabOrder = 2
-      Text = '14'
+      Text = '0,05'
     end
     object xAxisLineHeightThreshold: TEdit
       Left = 168
@@ -130,7 +130,7 @@ object MainForm: TMainForm
       Width = 57
       Height = 21
       TabOrder = 3
-      Text = '14'
+      Text = '1'
     end
     object xAxisValleyWidthThreshold: TEdit
       Left = 168
@@ -138,7 +138,7 @@ object MainForm: TMainForm
       Width = 57
       Height = 21
       TabOrder = 4
-      Text = '24'
+      Text = '2'
     end
     object WordsButton: TButton
       Left = 168
@@ -148,6 +148,24 @@ object MainForm: TMainForm
       Caption = 'Split Words'
       TabOrder = 5
       OnClick = WordsButtonClick
+    end
+    object LinesBatchButton: TButton
+      Left = 10
+      Top = 200
+      Width = 100
+      Height = 25
+      Caption = 'Split Lines Batch'
+      TabOrder = 8
+      OnClick = EvaluateLinesClick
+    end
+    object WordsBatchButton: TButton
+      Left = 120
+      Top = 200
+      Width = 100
+      Height = 25
+      Caption = 'Split Words Batch'
+      TabOrder = 9
+      OnClick = EvaluateWordsClick
     end
     object CheckBox1: TCheckBox
       Left = 16
