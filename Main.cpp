@@ -170,7 +170,7 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
     FILE *fp = fopen(output.c_str(), "wb+");
     for(int y = 0; y < Iy; ++y) {
         for(int x = 0; x < Ix; ++x) {
-            fwrite(&values[y*Ix+x], 1, sizeof(int), fp);
+                fwrite(&values[y*Ix+x], 1, sizeof(int), fp);
         }
     }
     fclose(fp);
@@ -420,13 +420,13 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
     int **horizontal_histogram;
     float y_valley_threshold = StrToFloat(yAxisValleyHeightThreshold->Text);
 
-    if ((horizontal_histogram = new int*[Iy]) == NULL ) {
+    if ((horizontal_histogram = new int*[20]) == NULL ) {
         cerr << "Error in y histogram allocation" << endl;
         exit(-1);
     }
 
-    for (int i = 0; i < Iy; i++)
-        horizontal_histogram[i] = new int[20];
+    for (int i = 0; i < 20; i++)
+        horizontal_histogram[i] = new int[Iy];
 
    int chunk_size = floor((float)Ix/20.0);
    int integer_width_covered = 20 * chunk_size;
@@ -435,7 +435,7 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
    /** Generate projection profiles for chunks **/
    for (int i = 0; i < Iy; i++) {
        for (int chunk_no = 0; chunk_no < 20; chunk_no++) {
-           horizontal_histogram[i][chunk_no] = 0;
+           horizontal_histogram[chunk_no][i] = 0;
            int start = chunk_no * chunk_size, end;
 
            if (chunk_no < 19)
@@ -445,7 +445,7 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
 
            for (int j = start; j < end; j++) {
                if (IMAGE[i * Ix + j] == 0)
-                 horizontal_histogram[i][chunk_no] += 1;
+                 horizontal_histogram[chunk_no][i] += 1;
            }
        }
    }
@@ -458,12 +458,12 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
 
     for (int i = 0; i < Iy; i++)
         for (int j = 0; j < 5; j++)
-            smoothed_projection_profiles[i] += horizontal_histogram[i][j];
+            smoothed_projection_profiles[i] += horizontal_histogram[j][i];
 
-    /**for (int i = 0; i < Iy; i++) {
+    for (int i = 0; i < Iy; i++) {
         for (int j = 0; j < smoothed_projection_profiles[i]; j++)
             IMAGE[i* Ix + j] = 0;
-    }  **/
+    }
 
     float line_width_threshold = StrToFloat(yAxisLineWidthThreshold->Text);
     float line_pixel_threshold = (line_width_threshold*Ix)/100.0;
@@ -479,7 +479,7 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
     
     vector<int> peak_vector, valley_vector;
     int i = 0;
-    while (i < Iy-1) {                  
+    while (i < Iy-1) {
         while (smoothed_projection_profiles[i] == 1)
               i++;
         int peak = i;
@@ -494,10 +494,13 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
 
     }
 
+    if (valley_vector.size() == 2)
+       return;
+
     int colour = 1;
     for(int i = 0; i < valley_vector.size()-1; ++i) {
         for(int x = valley_vector[i]; x < valley_vector[i+1]; ++x) {
-            for(int y = 0; y < /*5 * chunk_size*/Ix; ++y) {
+            for(int y = 0; y < chunk_size; ++y) {
                 if(IMAGE[x*Ix+y] == 0) {
                     IMAGE[x*Ix+y] = (values_to_write[x*Ix+y] = colour);
                 }
@@ -505,7 +508,70 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
         }
         colour++;
     }
+    for (int x = 1; x < 20; x++) {
+    for(int y = 0; y < Iy; ++y) {
+        //horizontal_histogram[x][y] = (horizontal_histogram[x][y] >= line_pixel_threshold);
+    }
+    }
 
+
+    //vector<int> all_valleys_vector[20];
+
+    int all_valleys_vector[20][200];
+    for (int i = 0; i < 20; i++)
+        for (int j = 0; j < 200; j++)
+            all_valleys_vector[i][j] = -1;
+
+
+    for (int j = 1; j < 20; j++) {
+        int i = 0;
+        int counter = 0;
+        while (i < Iy-1) {
+              while (horizontal_histogram[j][i] > 0)
+              i++;
+              int peak = i;
+              //peak_vector.push_back(peak);
+
+              int valley_start = i;
+              while (horizontal_histogram[j][i] < y_valley_threshold * (float) Iy / 100.0)
+              i++;
+              if (i + 1 < Iy) {
+                 int valley_end = i+1;
+                 if (valley_end - valley_start){
+                     all_valleys_vector[j][counter] = valley_end;
+                     counter++;
+                 }
+              }
+        }
+    }
+    int valley_colour = 170;
+    for (int chunk_no = 1; chunk_no < 20; chunk_no++) {
+    int colour = 1;
+    for(int i = 0; i < 200; ++i) {
+        if (all_valleys_vector[chunk_no][i] == -1)
+           break;
+        for(int x = all_valleys_vector[chunk_no][i]; x < all_valleys_vector[chunk_no][i+1]; ++x) {
+            int valley = all_valleys_vector[chunk_no][i];
+            int start = chunk_no * chunk_size, end;
+            if (chunk_no < 19)
+               end = start + chunk_size;
+            else
+                end = start + final_chunk_size;
+            for(int y = start; y < end; ++y) {
+                if(IMAGE[x*Ix+y] == 0) {
+                    IMAGE[x*Ix+y] = (values_to_write[x*Ix+y] = colour);
+                }
+            }
+
+            for(int y = start; y < end; ++y) {
+                    IMAGE[valley*Ix +y] = valley_colour;
+            }
+        }
+        colour++;
+    }
+    }
+
+    
     FILE *fp = fopen(output.c_str(), "wb+");
     for(int y = 0; y < Iy; ++y) {
         for(int x = 0; x < Ix; ++x) {
