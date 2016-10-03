@@ -38,8 +38,7 @@ class TMainForm : public TForm
     TLabel *Label4;
     TButton *LinesButton;
     TButton *WordsButton;
-    TCheckBox *CheckBox1;
-    TCheckBox *CheckBox2;
+    TButton *SplitBatchLinesButton;
     void __fastcall Open1Click(TObject *Sender);
     void __fastcall Exit1Click(TObject *Sender);
     void __fastcall Lines1Click(TObject *Sender);
@@ -48,6 +47,7 @@ class TMainForm : public TForm
     void __fastcall LinesButtonClick(TObject *Sender);
     void __fastcall WordsButtonClick(TObject *Sender);
     void __fastcall EvaluateLinesClick(TObject *Sender);
+    void __fastcall EvaluateNewLinesClick(TObject *Sender);
     void __fastcall EvaluateWordsClick(TObject *Sender);
     void __fastcall SplitLinesNewClick(TObject *Sender);
     private:	// User declarations
@@ -56,7 +56,7 @@ class TMainForm : public TForm
     long offs;
     AnsiString text;
     AnsiString output;
-    void words(int ys,int ye,int& tag,int *values);
+    void SplitLineToWords(int ys,int ye,int& tag,int *values);
     public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);
 };

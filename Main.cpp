@@ -123,7 +123,7 @@ void __fastcall TMainForm::Lines1Click(TObject *Sender) {
            count++;
     }
 
-    int line_width_threshold = CheckBox1->Checked ? sum/count : StrToFloat(yAxisLineWidthThreshold->Text);  //minimum line height in pixels
+    int line_width_threshold = StrToFloat(yAxisLineWidthThreshold->Text);  //minimum line height in pixels
 
     for(int y = 0; y < Iy; ++y) {
         float line_pixel_threshold = (float)((line_width_threshold*Ix)/100.0);
@@ -243,7 +243,7 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
             ++count;
     }
 
-    float line_width_threshold = CheckBox1->Checked ? sum/count : StrToFloat(yAxisLineWidthThreshold->Text);
+    float line_width_threshold = StrToFloat(yAxisLineWidthThreshold->Text);
     float line_pixel_threshold = (line_width_threshold*Ix)/100.0;
     for(int y = 0; y < Iy; ++y) {
         horizontal_histogram[y] = (horizontal_histogram[y] >= line_pixel_threshold);
@@ -275,7 +275,7 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
 
     int colour = 1;
     for(int i = 0; i < horizontal_cuts.size() - 1; ++i) {
-        MainForm->words(horizontal_cuts[i], horizontal_cuts[i+1], colour, values_to_write);
+        MainForm->SplitLineToWords(horizontal_cuts[i], horizontal_cuts[i+1], colour, values_to_write);
     }
 
     FILE *fp = fopen(output.c_str(), "wb+");
@@ -289,7 +289,7 @@ void __fastcall TMainForm::Words1Click(TObject *Sender)
     ImagXpress7_1->LoadBuffer((long) this->IMAGE);
 }
 
-void TMainForm::words(int ys, int ye, int& colour, int* values_to_write) {
+void TMainForm::SplitLineToWords(int ys, int ye, int& colour, int* values_to_write) {
 
     int *vertical_histogram = new int[Ix];
     long sum = 0, count = 0;
@@ -308,7 +308,7 @@ void TMainForm::words(int ys, int ye, int& colour, int* values_to_write) {
         ++count;
     }
 
-    x_axis_threshold = CheckBox2->Checked ? sum/count : StrToFloat(xAxisLineHeightThreshold->Text);
+    x_axis_threshold = StrToFloat(xAxisLineHeightThreshold->Text);
     for(int x = 0; x < Ix; ++x) {
         float column_pixel_threshold = (float)(x_axis_threshold * Iy)/100.0;
         vertical_histogram[x] = vertical_histogram[x] >= column_pixel_threshold;
@@ -370,6 +370,18 @@ void __fastcall TMainForm::EvaluateLinesClick(TObject *Sender)
                 output = "C:\\Users\\nymeria\\Documents\\evaluation\\results\\lines\\" + IntToStr(i) + ".tif.dat";
                 //Lines1Click(Sender);
                 SplitLinesNewClick(Sender);
+        }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMainForm::EvaluateNewLinesClick(TObject *Sender)
+{
+        for(int i=101; i<301; ++i){
+                ImagXpress7_1->FileName = "C:\\Users\\nymeria\\Documents\\evaluation\\images\\" + IntToStr(i) + ".tif";
+                OpenDialog->FileName = ImagXpress7_1->FileName;
+                output = "C:\\Users\\nymeria\\Documents\\evaluation\\results\\lines\\" + IntToStr(i) + ".tif.dat";
+                Lines1Click(Sender);
+                //SplitLinesNewClick(Sender);
         }
 }
 //---------------------------------------------------------------------------

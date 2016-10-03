@@ -27,7 +27,7 @@ object MainForm: TMainForm
     ControlData = {
       0800420000004200310033004200300035004600460036003100330042003200
       4200390042003300300030003100300037004100420032004600390044004600
-      3800460038000000732A7471B8D1ADF503000100000010070000A86D0000D73B
+      3800460038000000566D1B33028EEE7B03000100000010070000A86D0000D73B
       000008000200000000000300040000001300C0C0C0000B00FFFF09000352E30B
       918FCE119DE300AA004BB85101A10000BC02444201000D4D532053616E732053
       6572696609000000000000000000000000000000000013000000000013000000
@@ -155,7 +155,7 @@ object MainForm: TMainForm
       Width = 100
       Height = 25
       Caption = 'Split Lines Batch'
-      TabOrder = 8
+      TabOrder = 7
       OnClick = EvaluateLinesClick
     end
     object WordsBatchButton: TButton
@@ -173,24 +173,17 @@ object MainForm: TMainForm
       Width = 200
       Height = 25
       Caption = 'Split Lines New'
-      TabOrder = 10
+      TabOrder = 6
       OnClick = SplitLinesNewClick
     end
-    object CheckBox1: TCheckBox
-      Left = 16
-      Top = 48
-      Width = 201
-      Height = 17
-      Caption = 'Select average horizontal black pixels per line as threshold'
-      TabOrder = 6
-    end
-    object CheckBox2: TCheckBox
-      Left = 16
-      Top = 120
-      Width = 209
+    object SplitBatchLinesButton: TButton
+      Left = 10
+      Top = 250
+      Width = 200
       Height = 25
-      Caption = 'Select average vertical black pixels per line as threshold'
-      TabOrder = 7
+      Caption = 'Split Lines New Batch'
+      TabOrder = 8
+      OnClick = EvaluateNewLinesClick
     end
   end
   object MainMenu: TMainMenu
