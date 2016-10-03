@@ -39,11 +39,11 @@ class TMainForm : public TForm
     TButton *LinesButton;
     TButton *WordsButton;
     TButton *SplitBatchLinesButton;
-    void __fastcall Open1Click(TObject *Sender);
-    void __fastcall Exit1Click(TObject *Sender);
-    void __fastcall Lines1Click(TObject *Sender);
+    void __fastcall OpenClick(TObject *Sender);
+    void __fastcall ExitClick(TObject *Sender);
+    void __fastcall LinesClick(TObject *Sender);
     void __fastcall ImagXpress7_1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
-    void __fastcall Words1Click(TObject *Sender);
+    void __fastcall WordsClick(TObject *Sender);
     void __fastcall LinesButtonClick(TObject *Sender);
     void __fastcall WordsButtonClick(TObject *Sender);
     void __fastcall EvaluateLinesClick(TObject *Sender);

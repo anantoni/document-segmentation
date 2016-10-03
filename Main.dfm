@@ -27,7 +27,7 @@ object MainForm: TMainForm
     ControlData = {
       0800420000004200310033004200300035004600460036003100330042003200
       4200390042003300300030003100300037004100420032004600390044004600
-      3800460038000000566D1B33028EEE7B03000100000010070000A86D0000D73B
+      38004600380000009A3C827D006D1FD903000100000010070000A86D0000D73B
       000008000200000000000300040000001300C0C0C0000B00FFFF09000352E30B
       918FCE119DE300AA004BB85101A10000BC02444201000D4D532053616E732053
       6572696609000000000000000000000000000000000013000000000013000000
@@ -194,7 +194,7 @@ object MainForm: TMainForm
       object Open1: TMenuItem
         Caption = '&Open'
         ShortCut = 16463
-        OnClick = Open1Click
+        OnClick = OpenClick
       end
       object N2: TMenuItem
         Caption = '-'
@@ -202,12 +202,12 @@ object MainForm: TMainForm
       object Lines1: TMenuItem
         Caption = 'Lines'
         ShortCut = 16460
-        OnClick = Lines1Click
+        OnClick = LinesClick
       end
       object Words1: TMenuItem
         Caption = 'Words'
         ShortCut = 16471
-        OnClick = Words1Click
+        OnClick = WordsClick
       end
       object N1: TMenuItem
         Caption = '-'
@@ -215,7 +215,7 @@ object MainForm: TMainForm
       object Exit1: TMenuItem
         Caption = 'Exit'
         ShortCut = 16453
-        OnClick = Exit1Click
+        OnClick = ExitClick
       end
     end
   end

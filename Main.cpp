@@ -24,7 +24,7 @@ __fastcall TMainForm::TMainForm(TComponent* Owner) : TForm(Owner) {
     ImagXpress7_1->ScrollBars = 3;
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::Open1Click(TObject *Sender) {
+void __fastcall TMainForm::OpenClick(TObject *Sender) {
 
     if (OpenDialog->Execute() && FileExists(OpenDialog->FileName)) {
         ImagXpress7_1->FileName = OpenDialog->FileName;
@@ -53,14 +53,14 @@ void __fastcall TMainForm::Open1Click(TObject *Sender) {
     }
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::Exit1Click(TObject *Sender) {
+void __fastcall TMainForm::ExitClick(TObject *Sender) {
     if (IMAGE != NULL) {
         GlobalFree(IMAGE);
     }
     MainForm->Close();
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::Lines1Click(TObject *Sender) {
+void __fastcall TMainForm::LinesClick(TObject *Sender) {
     ImagXpress7_1->FileName = OpenDialog->FileName;
     Ix = ImagXpress7_1->IWidth;
     Iy = ImagXpress7_1->IHeight;
@@ -186,7 +186,7 @@ void __fastcall TMainForm::ImagXpress7_1MouseMove(TObject *Sender, TShiftState S
     StatusBar->SimpleText = text + " x: " + IntToStr(ImagXpress7_1->DIBXPos) + ", y: " + IntToStr(ImagXpress7_1->DIBYPos) + " value " + IntToStr(ImagXpress7_1->DIBGetPixel(ImagXpress7_1->DIBXPos,ImagXpress7_1->DIBYPos));
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::Words1Click(TObject *Sender)
+void __fastcall TMainForm::WordsClick(TObject *Sender)
 {
     ImagXpress7_1->FileName = OpenDialog->FileName;
     Ix = ImagXpress7_1->IWidth;
@@ -353,22 +353,20 @@ void TMainForm::SplitLineToWords(int ys, int ye, int& colour, int* values_to_wri
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::LinesButtonClick(TObject *Sender)
 {
-    Lines1Click(Sender);
+    LinesClick(Sender);
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::WordsButtonClick(TObject *Sender)
 {
-    Words1Click(Sender);
+    WordsClick(Sender);
 }
 //---------------------------------------------------------------------------
-//C:\Users\nymeria\Documents\evaluation
 void __fastcall TMainForm::EvaluateLinesClick(TObject *Sender)
 {
         for(int i=101; i<301; ++i){
                 ImagXpress7_1->FileName = "C:\\Users\\nymeria\\Documents\\evaluation\\images\\" + IntToStr(i) + ".tif";
                 OpenDialog->FileName = ImagXpress7_1->FileName;
                 output = "C:\\Users\\nymeria\\Documents\\evaluation\\results\\lines\\" + IntToStr(i) + ".tif.dat";
-                //Lines1Click(Sender);
                 SplitLinesNewClick(Sender);
         }
 }
@@ -380,8 +378,7 @@ void __fastcall TMainForm::EvaluateNewLinesClick(TObject *Sender)
                 ImagXpress7_1->FileName = "C:\\Users\\nymeria\\Documents\\evaluation\\images\\" + IntToStr(i) + ".tif";
                 OpenDialog->FileName = ImagXpress7_1->FileName;
                 output = "C:\\Users\\nymeria\\Documents\\evaluation\\results\\lines\\" + IntToStr(i) + ".tif.dat";
-                Lines1Click(Sender);
-                //SplitLinesNewClick(Sender);
+                LinesClick(Sender);
         }
 }
 //---------------------------------------------------------------------------
