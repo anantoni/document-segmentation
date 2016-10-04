@@ -367,7 +367,8 @@ void __fastcall TMainForm::EvaluateLinesClick(TObject *Sender)
                 ImagXpress7_1->FileName = "C:\\Users\\nymeria\\Documents\\evaluation\\images\\" + IntToStr(i) + ".tif";
                 OpenDialog->FileName = ImagXpress7_1->FileName;
                 output = "C:\\Users\\nymeria\\Documents\\evaluation\\results\\lines\\" + IntToStr(i) + ".tif.dat";
-                SplitLinesNewClick(Sender);
+                LinesClick(Sender);
+
         }
 }
 //---------------------------------------------------------------------------
@@ -378,7 +379,7 @@ void __fastcall TMainForm::EvaluateNewLinesClick(TObject *Sender)
                 ImagXpress7_1->FileName = "C:\\Users\\nymeria\\Documents\\evaluation\\images\\" + IntToStr(i) + ".tif";
                 OpenDialog->FileName = ImagXpress7_1->FileName;
                 output = "C:\\Users\\nymeria\\Documents\\evaluation\\results\\lines\\" + IntToStr(i) + ".tif.dat";
-                LinesClick(Sender);
+                SplitLinesNewClick(Sender);
         }
 }
 //---------------------------------------------------------------------------
@@ -389,7 +390,7 @@ void __fastcall TMainForm::EvaluateWordsClick(TObject *Sender)
                 ImagXpress7_1->FileName = "C:\\Users\\nymeria\\Documents\\evaluation\\images\\" + IntToStr(i) + ".tif";
                 OpenDialog->FileName = ImagXpress7_1->FileName;
                 output = "C:\\Users\\nymeria\\Documents\\evaluation\\results\\words\\" + IntToStr(i) + ".tif.dat";
-                Words1Click(Sender);
+                WordsClick(Sender);
         }
 }
 //---------------------------------------------------------------------------
@@ -523,9 +524,9 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
         colour++;
     }
     for (int x = 1; x < 20; x++) {
-    for(int y = 0; y < Iy; ++y) {
-        horizontal_histogram[x][y] = (horizontal_histogram[x][y] >= line_pixel_threshold);
-    }
+        for(int y = 0; y < Iy; ++y) {
+            horizontal_histogram[x][y] = (horizontal_histogram[x][y] >= line_pixel_threshold);
+        }
     }
 
 
@@ -555,10 +556,10 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
               int valley_end = i+1;
               if (i + 1 < Iy) {
               int midean = peak + (valley_end - peak)/2;
-        if (valley_end - peak >= (float)y_valley_threshold*Ix/100.0) {
-           all_valleys_vector[j][counter] = midean;
-           counter++;
-        }
+                  if (valley_end - peak >= (float)y_valley_threshold*Ix/100.0) {
+                     all_valleys_vector[j][counter] = midean;
+                     counter++;
+                  }
                  /*int valley_end = i+1;
                  if (valley_end - valley_start >= y_valley_threshold * (float) Iy / 100.0){
                      all_valleys_vector[j][counter] = valley_end;
@@ -703,6 +704,11 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
     } 
     fclose(fp);
 
+    for (int i = 0; i < 20; i++)
+        delete[] horizontal_histogram;
+    delete[] horizontal_histogram;
+    
+    delete[] smoothed_projection_profiles;
     delete[] values_to_write;
     ImagXpress7_1->DIBUpdate();
     ImagXpress7_1->LoadBuffer((long) this->IMAGE);
