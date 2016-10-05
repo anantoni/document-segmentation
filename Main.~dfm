@@ -27,7 +27,7 @@ object MainForm: TMainForm
     ControlData = {
       0800420000004200310033004200300035004600460036003100330042003200
       4200390042003300300030003100300037004100420032004600390044004600
-      3800460038000000C4170D2155CF42A403000100000010070000A86D0000D73B
+      38004600380000003D0C9D6AA934751003000100000010070000A86D0000D73B
       000008000200000000000300040000001300C0C0C0000B00FFFF09000352E30B
       918FCE119DE300AA004BB85101A10000BC02444201000D4D532053616E732053
       6572696609000000000000000000000000000000000013000000000013000000
@@ -103,7 +103,7 @@ object MainForm: TMainForm
       Left = 168
       Top = 32
       Width = 57
-      Height = 13
+      Height = 21
       TabOrder = 0
       Text = '0,1'
     end
@@ -160,7 +160,7 @@ object MainForm: TMainForm
     end
     object WordsButton: TButton
       Left = 120
-      Top = 176
+      Top = 180
       Width = 100
       Height = 25
       Caption = 'Split Words'
@@ -169,12 +169,21 @@ object MainForm: TMainForm
     end
     object WordsBatchButton: TButton
       Left = 120
-      Top = 200
+      Top = 220
       Width = 100
       Height = 25
       Caption = 'Split Words Batch'
       TabOrder = 9
       OnClick = EvaluateWordsClick
+    end
+    object WordsDetailedButton: TButton
+      Left = 120
+      Top = 260
+      Width = 100
+      Height = 25
+      Caption = 'Split Words Detailed'
+      TabOrder = 11
+      OnClick = WordsDetailedClick
     end
     object SplitLines2Button: TButton
       Left = 10
