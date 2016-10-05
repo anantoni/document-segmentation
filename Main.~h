@@ -39,6 +39,7 @@ class TMainForm : public TForm
     TButton *LinesButton;
     TButton *WordsButton;
     TButton *SplitBatchLinesButton;
+    TButton *LinesDetailedButton;
     void __fastcall OpenClick(TObject *Sender);
     void __fastcall ExitClick(TObject *Sender);
     void __fastcall LinesClick(TObject *Sender);
@@ -50,6 +51,7 @@ class TMainForm : public TForm
     void __fastcall EvaluateNewLinesClick(TObject *Sender);
     void __fastcall EvaluateWordsClick(TObject *Sender);
     void __fastcall SplitLinesNewClick(TObject *Sender);
+    void __fastcall LinesDetailedClick(TObject *Sender);
     private:	// User declarations
     int Ix, Iy;
     unsigned char *IMAGE;
