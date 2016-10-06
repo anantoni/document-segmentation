@@ -27,7 +27,7 @@ object MainForm: TMainForm
     ControlData = {
       0800420000004200310033004200300035004600460036003100330042003200
       4200390042003300300030003100300037004100420032004600390044004600
-      38004600380000003D0C9D6AA934751003000100000010070000A86D0000D73B
+      3800460038000000D266414627EF854403000100000010070000A86D0000D73B
       000008000200000000000300040000001300C0C0C0000B00FFFF09000352E30B
       918FCE119DE300AA004BB85101A10000BC02444201000D4D532053616E732053
       6572696609000000000000000000000000000000000013000000000013000000
@@ -187,21 +187,39 @@ object MainForm: TMainForm
     end
     object SplitLines2Button: TButton
       Left = 10
-      Top = 400
+      Top = 300
       Width = 200
       Height = 25
       Caption = 'Split Lines New'
+      TabOrder = 12
+      OnClick = SplitLinesNewClick
+    end
+    object SplitLines3Button: TButton
+      Left = 10
+      Top = 340
+      Width = 200
+      Height = 25
+      Caption = 'Split Lines New Detailed'
       TabOrder = 6
       OnClick = SplitLinesNewClick
     end
     object SplitBatchLinesButton: TButton
       Left = 10
-      Top = 450
+      Top = 380
       Width = 200
       Height = 25
       Caption = 'Split Lines New Batch'
-      TabOrder = 8
+      TabOrder = 13
       OnClick = EvaluateNewLinesClick
+    end
+    object SplitWordsNewButton: TButton
+      Left = 10
+      Top = 420
+      Width = 200
+      Height = 25
+      Caption = 'Split Words New'
+      TabOrder = 8
+      OnClick = SplitWordsNewClick
     end
   end
   object MainMenu: TMainMenu
