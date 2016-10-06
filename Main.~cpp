@@ -24,7 +24,7 @@ TMainForm *MainForm;
 #include "Unit3.h"
 #include "Unit4.h"
 using namespace std;
-#define max_valleys 50
+#define max_valleys 200
 //---------------------------------------------------------------------------
 __fastcall TMainForm::TMainForm(TComponent* Owner) : TForm(Owner) {
     ImagXpress7_1->ScrollBars = 3;
@@ -916,14 +916,14 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
        }
    }
 
-   for (int i = 0; i < 20; i++) {
+   /*for (int i = 0; i < 20; i++) {
        for (int j = 0; j < Form1->Iy1; j++) {
              for (int index = i*chunk_size; index < i*chunk_size+horizontal_histogram[i][j]; index++) {
                  IMAGE1[j*Ix + index] = 50;
              }
 
        }
-   }
+   }*/
    int* smoothed_projection_profiles;
    if ((smoothed_projection_profiles = new int[Iy]) == NULL ) {
         cerr << "Error in y histogram allocation" << endl;
@@ -940,11 +940,11 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
         smoothed_projection_profiles[y] = (smoothed_projection_profiles[y] >= line_pixel_threshold);
     }
 
-    //for (int i = 0; i < Iy; i++) {
-    //    if (smoothed_projection_profiles[i] == 1)
-    //       for (int j = 0; j < 50; j++)
-    //        IMAGE[i* Ix + j] = 0;
-    //}
+    /*for (int i = 0; i < Iy; i++) {
+        if (smoothed_projection_profiles[i] == 1)
+           for (int j = 0; j < 50; j++)
+            IMAGE[i* Ix + j] = 0;
+    }*/
 
     vector<int> peak_vector, valley_vector;
     int i = 0;
@@ -981,7 +981,7 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
     }
     for (int x = 1; x < 20; x++) {
         for(int y = 0; y < Iy; ++y) {
-            horizontal_histogram[x][y] = (horizontal_histogram[x][y] >= line_pixel_threshold/20.0);
+            //horizontal_histogram[x][y] = (horizontal_histogram[x][y] >= line_pixel_threshold/20.0);
         }
     }
 
@@ -998,7 +998,7 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
         int i = 0, counter = 0;
         
         while (i < Iy) {
-              while (horizontal_histogram[j][i] == 1)
+              while (horizontal_histogram[j][i] > 0)
                     i++;
               int peak = i;
               
@@ -1017,23 +1017,17 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
     /**
      *  For all chunks
      **/
-
-
-     
     for (int chunk_no = 1; chunk_no < 20; chunk_no++) {
         vector<int> already_used_valleys;
         vector<int> connected_to_used_valleys;
         
-        for(int i = 0; i < max_valleys; ++i) {                       //for all their valleys
+        for(int i = 0; i < max_valleys; i++) {                       //for all their valleys of the current chunk
             if (all_valleys_vector[chunk_no][i] == -1)
                break;
 
-            int min = Ix, min_pos = -1;
-            for (int j = 0; j < max_valleys; j++)  {                 // and for all the valleys of the previous chunk
-                if (all_valleys_vector[chunk_no-1][j] == -1)
-                  break;
-
-                if (all_valleys_vector[chunk_no-1][j] == -2)
+            int min = Iy, min_pos = -1;
+            for (int j = 0; j < max_valleys; j++)  {                 // and for all the valleys of the previous chunk that are not smaller than zero
+                if (all_valleys_vector[chunk_no-1][j] < 0)
                   continue;
 
                 int distance = abs(all_valleys_vector[chunk_no-1][j] - all_valleys_vector[chunk_no][i]);
@@ -1053,8 +1047,6 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
                    break;
                 }
             }
-
-
 
             //  If not already connected: Add the previous chucnk valley and the current valley to the two vectors
 
@@ -1079,8 +1071,8 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
         
         // This part expands unconnected valleys from the previous chunk to the current one 
         for (int counter = 0; counter < max_valleys; counter++) {
-                if (all_valleys_vector[chunk_no-1][counter] == -1)
-                   break;
+                if (all_valleys_vector[chunk_no-1][counter] < 0)
+                   continue;
 
                 bool found = false;
                 int search = all_valleys_vector[chunk_no-1][counter];
@@ -1099,49 +1091,46 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
                           move_counter--;
                     }
                     all_valleys_vector[chunk_no][counter] = all_valleys_vector[chunk_no-1][counter];
-                } 
-
-            }
+                }
+        }
     }
     
     int valley_colour = 170;
-    for (int chunk_no = 0; chunk_no < 20; chunk_no++) {
-    int colour = 1;
-    for(int i = 0; i < max_valleys; i++) {
-        if (all_valleys_vector[chunk_no][i] == -2)
-           continue;
+    for (int chunk_no = 1; chunk_no < 20; chunk_no++) {
+        int colour = 1;
+        
+        for(int i = 0; i < max_valleys; i++) {
+                if (all_valleys_vector[chunk_no][i] < 0)
+                   continue;
 
-        if (all_valleys_vector[chunk_no][i] == -1)
-           break;
-
-        int next_offset = 1;
-        while (all_valleys_vector[chunk_no][i+next_offset] == -2) {
-            next_offset++;
-        }
-
-        for(int x = all_valleys_vector[chunk_no][i]; x < all_valleys_vector[chunk_no][i+next_offset]; x++) {
-            int valley = all_valleys_vector[chunk_no][i];
-            int start = chunk_no * chunk_size, end, image2_end;
-            if (chunk_no < 19)
-               end = start + chunk_size;
-            else  {
-                end = Ix;
-                end = Form1->Ix2;
-            }
-            for(int y = start; y < end; y++) {
-
-               if(IMAGE[x*Ix+y] == 0) {
-                    IMAGE[x*Ix+y] = values_to_write[x*Ix+y] = colour;
+                int next_offset = 1;
+                while (all_valleys_vector[chunk_no][i+next_offset] == -2) {
+                      next_offset++;
                 }
-             }
 
-            for(int y = start; y < end; y++) {
-                   IMAGE2[valley*Form1->Ix2+y] = valley_colour;
-            }
+                for(int x = all_valleys_vector[chunk_no][i]; x < all_valleys_vector[chunk_no][i+next_offset]; x++) {
+                        int valley = all_valleys_vector[chunk_no][i];
+                        int start = chunk_no * chunk_size, end, image2_end;
+                        
+                        if (chunk_no < 19)
+                           end = start + chunk_size;
+                        else  {
+                           end = Ix;
+                           image2_end = Form1->Ix2;
+                        }
+                        for(int y = start; y < end; y++) {
+                            if (x < Iy && y < Ix)
+                               if(IMAGE[x*Ix+y] == 0)
+                                   IMAGE[x*Ix+y] = values_to_write[x*Ix+y] = colour;
 
+                        }
+
+                        /*for(int y = start; y < end; y++) {
+                            IMAGE[valley*Form1->Ix2+y] = valley_colour;
+                        }*/
+                }
+                colour++;
         }
-        colour++;                                                                           
-    }
     }
 
     
@@ -1161,15 +1150,19 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
     delete[] values_to_write;
     ImagXpress7_1->DIBUpdate();
     ImagXpress7_1->LoadBuffer((long) this->IMAGE);
-    delete[] IMAGE;
 
-    Form1->Show();
+
+    /*Form1->Show();
     Form1->ImagXpress7_1->DIBUpdate();
     Form1->ImagXpress7_1->LoadBuffer((long) Form1->IMAGE1);
 
+
     Form1->ImagXpress7_2->DIBUpdate();
-    Form1->ImagXpress7_2->LoadBuffer((long) Form1->IMAGE2);
-    }
+    Form1->ImagXpress7_2->LoadBuffer((long) Form1->IMAGE2);   */
+    delete[] IMAGE;
+    delete[] IMAGE1;
+    delete[] IMAGE2;
+}
 
 void __fastcall TMainForm::SplitWordsNewClick(TObject *Sender)
 {
