@@ -18,13 +18,13 @@ TMainForm *MainForm;
 #include<math.h>
 #include<string.h>
 #include<sstream>
-
+             #include <assert.h>
 #include "Unit1.h"
 #include "Unit2.h"
 #include "Unit3.h"
 #include "Unit4.h"
 using namespace std;
-#define max_valleys 200
+
 //---------------------------------------------------------------------------
 __fastcall TMainForm::TMainForm(TComponent* Owner) : TForm(Owner) {
     ImagXpress7_1->ScrollBars = 3;
@@ -872,9 +872,9 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
     unsigned char *IMAGE1 = &Form1->IMAGE1[Form1->offs1];
     unsigned char *IMAGE2 = &Form1->IMAGE2[Form1->offs2];
 
-    for (int i = 0; i < Form1->Ix1; i++)
-        for (int j = 0; j < Form1->Iy1; j++)
-            IMAGE1[j*Form1->Ix1 + i] = 255;
+    //for (int i = 0; i < Form1->Ix1; i++)
+    //    for (int j = 0; j < Form1->Iy1; j++)
+    //        IMAGE1[j*Form1->Ix1 + i] = 255;
 
     /** Initialize all starting values to write to data file to 0 **/
     int *values_to_write = new int[Ix*Iy];
@@ -916,14 +916,16 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
        }
    }
 
-   /*for (int i = 0; i < 20; i++) {
+
+
+   for (int i = 0; i < 20; i++) {
        for (int j = 0; j < Form1->Iy1; j++) {
              for (int index = i*chunk_size; index < i*chunk_size+horizontal_histogram[i][j]; index++) {
                  IMAGE1[j*Ix + index] = 50;
              }
 
        }
-   }*/
+   }
    int* smoothed_projection_profiles;
    if ((smoothed_projection_profiles = new int[Iy]) == NULL ) {
         cerr << "Error in y histogram allocation" << endl;
@@ -940,11 +942,6 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
         smoothed_projection_profiles[y] = (smoothed_projection_profiles[y] >= line_pixel_threshold);
     }
 
-    /*for (int i = 0; i < Iy; i++) {
-        if (smoothed_projection_profiles[i] == 1)
-           for (int j = 0; j < 50; j++)
-            IMAGE[i* Ix + j] = 0;
-    }*/
 
     vector<int> peak_vector, valley_vector;
     int i = 0;
@@ -968,111 +965,107 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
     if (valley_vector.size() <= 2)
        return;
 
-    int colour = 1;
-    for(int i = 0; i < valley_vector.size()-1; i++) {
-        for(int x = valley_vector[i]; x < valley_vector[i+1]; x++) {
-            for(int y = 0; y < chunk_size; y++) {
-                if(IMAGE[x*Ix+y] == 0) {
-                    IMAGE[x*Ix+y] = (values_to_write[x*Ix+y] = colour);
-                }
-            }
-        }
-        colour++;
-    }
     for (int x = 1; x < 20; x++) {
         for(int y = 0; y < Iy; ++y) {
-            //horizontal_histogram[x][y] = (horizontal_histogram[x][y] >= line_pixel_threshold/20.0);
+            horizontal_histogram[x][y] = (horizontal_histogram[x][y] >= line_pixel_threshold/20.0);
         }
     }
-
-    int all_valleys_vector[20][max_valleys];
-    for (int i = 0; i < 20; i++)
-        for (int j = 0; j < max_valleys; j++)
-            all_valleys_vector[i][j] = -1;
+    /**
+     *   New way to use all_valleys_vector
+     **/
+    vector<int> *all_valleys_vector = new vector<int>[20];
+    /*for (int i = 0; i < Iy; i++) {
+        if (smoothed_projection_profiles[i] == 1)
+           for (int j = 0; j < 50; j++)
+            IMAGE[i* Ix + j] = 0;
+    }*/
 
 
     for (int j = 0; j < valley_vector.size(); j++)
-        all_valleys_vector[0][j] = valley_vector[j];
+        all_valleys_vector[0].push_back(valley_vector[j]);
 
     for (int j = 1; j < 20; j++) {
-        int i = 0, counter = 0;
-        
+        int i = 0;
+
         while (i < Iy) {
               while (horizontal_histogram[j][i] > 0)
                     i++;
               int peak = i;
-              
+
               while (horizontal_histogram[j][i] == 0)
                     i++;
               int valley_end = i;
 
               int midean = peak + (valley_end - peak)/2;
               if (valley_end - peak >= (float)y_valley_threshold*Iy/100.0) {
-                    all_valleys_vector[j][counter] = midean;
-                    counter++;
+                    all_valleys_vector[j].push_back(midean);
               }
         }
     }
 
+    for (int i = 0; i < 20; i++)
+        delete[] horizontal_histogram;
+    delete[] horizontal_histogram;
     /**
      *  For all chunks
      **/
     for (int chunk_no = 1; chunk_no < 20; chunk_no++) {
-        vector<int> already_used_valleys;
-        vector<int> connected_to_used_valleys;
-        
-        for(int i = 0; i < max_valleys; i++) {                       //for all their valleys of the current chunk
-            if (all_valleys_vector[chunk_no][i] == -1)
-               break;
+        vector<int> already_used_valleys, connected_to_used_valleys, mins_vector;
 
+        int current_chunk_pos = 0;
+        for(std::vector<int>::iterator i = all_valleys_vector[chunk_no].begin() ; i != all_valleys_vector[chunk_no].end();) {                       //for all their valleys of the current chunk
             int min = Iy, min_pos = -1;
-            for (int j = 0; j < max_valleys; j++)  {                 // and for all the valleys of the previous chunk that are not smaller than zero
-                if (all_valleys_vector[chunk_no-1][j] < 0)
-                  continue;
 
-                int distance = abs(all_valleys_vector[chunk_no-1][j] - all_valleys_vector[chunk_no][i]);
+            int pos = 0;
+            for (std::vector<int>::iterator j = all_valleys_vector[chunk_no-1].begin() ; j != all_valleys_vector[chunk_no-1].end(); ++j)  {                 // and for all the valleys of the previous chunk that are not smaller than zero
+                int distance = abs(*j - *i);
+
                 if (distance < min) {
                     min = distance;
-                    min_pos = j;
+                    min_pos = pos;
                 }
+                pos++;
             }
 
             // Check previous chunk closest valley is already connected
-            bool contains = false;
             int contains_index = -1;
             for (int counter = 0; counter < already_used_valleys.size(); counter++) {
                 if (already_used_valleys[counter] == all_valleys_vector[chunk_no-1][min_pos]) {
-                   contains = true;
                    contains_index = counter;
+                   //for (int mpla = 0; mpla < Ix; mpla++)
+                   //    IMAGE[2*Ix + mpla] =50;
                    break;
                 }
             }
 
-            //  If not already connected: Add the previous chucnk valley and the current valley to the two vectors
-
-            if (!contains) {
+            //  If previous valley chunk not already connected -> Add the previous chucnk valley and the current valley to the two vectors
+            if (contains_index == -1) {
                already_used_valleys.push_back(all_valleys_vector[chunk_no-1][min_pos]);
-               connected_to_used_valleys.push_back(i);
-            }
-            // if already connected: Check if we need to update and reject the previous current chunk closest valley or this one
+               connected_to_used_valleys.push_back(current_chunk_pos);
+               mins_vector.push_back(min);
+               i++;
 
+            }
+            
+            // if already connected -> Check if we need to update and reject the previous current chunk closest valley or this one
             else {
-                if (abs(all_valleys_vector[chunk_no-1][min_pos] - all_valleys_vector[chunk_no][connected_to_used_valleys[contains_index]]) <=
-                     abs(all_valleys_vector[chunk_no-1][min_pos] - all_valleys_vector[chunk_no][i]))
-                {
-                     all_valleys_vector[chunk_no][i] = -2;
+                if (mins_vector[contains_index] <= min) {
+                    i = all_valleys_vector[chunk_no].erase(i);
                 }
                 else {
-                     all_valleys_vector[chunk_no][connected_to_used_valleys[contains_index]] = -2;
-                     connected_to_used_valleys[contains_index] = i;
+                    i = all_valleys_vector[chunk_no].erase(all_valleys_vector[chunk_no].begin() + connected_to_used_valleys[contains_index]-1);
+                    //for (int l = 0; l < current_chunk_pos; connected_to_used_valleys[contains_index])
+                        
+                    //connected_to_used_valleys[contains_index] = *i;
+                    //break;
+                    i = all_valleys_vector[chunk_no].begin() + current_chunk_pos-1;
                 }
             }
+            current_chunk_pos++;
         }
-        
+
         // This part expands unconnected valleys from the previous chunk to the current one 
-        for (int counter = 0; counter < max_valleys; counter++) {
-                if (all_valleys_vector[chunk_no-1][counter] < 0)
-                   continue;
+        for (int counter = 0; counter < all_valleys_vector[chunk_no-1].size(); counter++) {
 
                 bool found = false;
                 int search = all_valleys_vector[chunk_no-1][counter];
@@ -1085,30 +1078,20 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
                 }
 
                 if (!found) {
-                    int move_counter = max_valleys-1;
-                    while (move_counter > counter) {
-                          all_valleys_vector[chunk_no][move_counter] = all_valleys_vector[chunk_no][move_counter-1];
-                          move_counter--;
-                    }
-                    all_valleys_vector[chunk_no][counter] = all_valleys_vector[chunk_no-1][counter];
+                    std::vector<int>::iterator it = all_valleys_vector[chunk_no].begin();
+                    all_valleys_vector[chunk_no].insert(it + counter, all_valleys_vector[chunk_no-1][counter]);
                 }
         }
+        assert (all_valleys_vector[chunk_no-1].size() == all_valleys_vector[chunk_no].size());
     }
     
     int valley_colour = 170;
-    for (int chunk_no = 1; chunk_no < 20; chunk_no++) {
+    for (int chunk_no = 0; chunk_no < 20; chunk_no++) {
         int colour = 1;
         
-        for(int i = 0; i < max_valleys; i++) {
-                if (all_valleys_vector[chunk_no][i] < 0)
-                   continue;
+        for(int i = 0; i < all_valleys_vector[chunk_no].size() - 1; i++) {
 
-                int next_offset = 1;
-                while (all_valleys_vector[chunk_no][i+next_offset] == -2) {
-                      next_offset++;
-                }
-
-                for(int x = all_valleys_vector[chunk_no][i]; x < all_valleys_vector[chunk_no][i+next_offset]; x++) {
+                for(int x = all_valleys_vector[chunk_no][i]; x < all_valleys_vector[chunk_no][i+1]; x++) {
                         int valley = all_valleys_vector[chunk_no][i];
                         int start = chunk_no * chunk_size, end, image2_end;
                         
@@ -1125,9 +1108,9 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
 
                         }
 
-                        /*for(int y = start; y < end; y++) {
+                        for(int y = start; y < end; y++) {
                             IMAGE[valley*Form1->Ix2+y] = valley_colour;
-                        }*/
+                        } 
                 }
                 colour++;
         }
@@ -1142,12 +1125,13 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
     } 
     fclose(fp);
 
-    for (int i = 0; i < 20; i++)
-        delete[] horizontal_histogram;
-    delete[] horizontal_histogram;
+
     
     delete[] smoothed_projection_profiles;
     delete[] values_to_write;
+    for (int i = 0; i < 20; i++)
+        all_valleys_vector[i].clear();
+    delete[] all_valleys_vector;
     ImagXpress7_1->DIBUpdate();
     ImagXpress7_1->LoadBuffer((long) this->IMAGE);
 
@@ -1158,7 +1142,7 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
 
 
     Form1->ImagXpress7_2->DIBUpdate();
-    Form1->ImagXpress7_2->LoadBuffer((long) Form1->IMAGE2);   */
+    Form1->ImagXpress7_2->LoadBuffer((long) Form1->IMAGE2);  */
     delete[] IMAGE;
     delete[] IMAGE1;
     delete[] IMAGE2;
@@ -1342,171 +1326,12 @@ void __fastcall TMainForm::SplitWordsNewClick(TObject *Sender)
         colour++;
     }
     for (int x = 1; x < 20; x++) {
-        for(int y = 0; y < Iy; ++y) {
-            horizontal_histogram[x][y] = (horizontal_histogram[x][y] >= line_pixel_threshold/20.0);
+        for(int y = 0; y < Iy; y++) {
+            horizontal_histogram[x][y] = (horizontal_histogram[x][y] >= (float)line_pixel_threshold/20.0);
         }
     }
 
-    int all_valleys_vector[20][max_valleys];
-    for (int i = 0; i < 20; i++)
-        for (int j = 0; j < max_valleys; j++)
-            all_valleys_vector[i][j] = -1;
-
-
-    for (int j = 0; j < valley_vector.size(); j++)
-        all_valleys_vector[0][j] = valley_vector[j];
-
-    for (int j = 1; j < 20; j++) {
-        int i = 0, counter = 0;
-        
-        while (i < Iy) {
-              while (horizontal_histogram[j][i] == 1)
-                    i++;
-              int peak = i;
-              
-              while (horizontal_histogram[j][i] == 0)
-                    i++;
-              int valley_end = i;
-
-              int midean = peak + (valley_end - peak)/2;
-              if (valley_end - peak >= (float)y_valley_threshold*Iy/100.0) {
-                    all_valleys_vector[j][counter] = midean;
-                    counter++;
-              }
-        }
-    }
-
-    /**
-     *  For all chunks
-     **/
-
-
-     
-    for (int chunk_no = 1; chunk_no < 20; chunk_no++) {
-        vector<int> already_used_valleys;
-        vector<int> connected_to_used_valleys;
-        
-        for(int i = 0; i < max_valleys; ++i) {                       //for all their valleys
-            if (all_valleys_vector[chunk_no][i] == -1)
-               break;
-
-            int min = Ix, min_pos = -1;
-            for (int j = 0; j < max_valleys; j++)  {                 // and for all the valleys of the previous chunk
-                if (all_valleys_vector[chunk_no-1][j] == -1)
-                  break;
-
-                if (all_valleys_vector[chunk_no-1][j] == -2)
-                  continue;
-
-                int distance = abs(all_valleys_vector[chunk_no-1][j] - all_valleys_vector[chunk_no][i]);
-                if (distance < min) {
-                    min = distance;
-                    min_pos = j;
-                }
-            }
-
-            // Check previous chunk closest valley is already connected
-            bool contains = false;
-            int contains_index = -1;
-            for (int counter = 0; counter < already_used_valleys.size(); counter++) {
-                if (already_used_valleys[counter] == all_valleys_vector[chunk_no-1][min_pos]) {
-                   contains = true;
-                   contains_index = counter;
-                   break;
-                }
-            }
-
-
-
-            //  If not already connected: Add the previous chucnk valley and the current valley to the two vectors
-
-            if (!contains) {
-               already_used_valleys.push_back(all_valleys_vector[chunk_no-1][min_pos]);
-               connected_to_used_valleys.push_back(i);
-            }
-            // if already connected: Check if we need to update and reject the previous current chunk closest valley or this one
-
-            else {
-                if (abs(all_valleys_vector[chunk_no-1][min_pos] - all_valleys_vector[chunk_no][connected_to_used_valleys[contains_index]]) <=
-                     abs(all_valleys_vector[chunk_no-1][min_pos] - all_valleys_vector[chunk_no][i]))
-                {
-                     all_valleys_vector[chunk_no][i] = -2;
-                }
-                else {
-                     all_valleys_vector[chunk_no][connected_to_used_valleys[contains_index]] = -2;
-                     connected_to_used_valleys[contains_index] = i;
-                }
-            }
-        }
-        
-        // This part expands unconnected valleys from the previous chunk to the current one 
-        for (int counter = 0; counter < max_valleys; counter++) {
-                if (all_valleys_vector[chunk_no-1][counter] == -1)
-                   break;
-
-                bool found = false;
-                int search = all_valleys_vector[chunk_no-1][counter];
-
-                for (int k = 0; k < already_used_valleys.size(); k++) {
-                    if (already_used_valleys[k] == search) {
-                       found = true;
-                       break;
-                    }
-                }
-
-                if (!found) {
-                    int move_counter = 39;
-                    while (move_counter > counter) {
-                          all_valleys_vector[chunk_no][move_counter] = all_valleys_vector[chunk_no][move_counter-1];
-                          move_counter--;
-                    }
-                    all_valleys_vector[chunk_no][counter] = all_valleys_vector[chunk_no-1][counter];
-                } 
-
-            }
-    }
-    
-    int valley_colour = 170;
-    for (int chunk_no = 0; chunk_no < 20; chunk_no++) {
-    int colour = 1;
-    for(int i = 0; i < max_valleys; i++) {
-        if (all_valleys_vector[chunk_no][i] == -2)
-           continue;
-
-        if (all_valleys_vector[chunk_no][i] == -1)
-           break;
-
-        int next_offset = 1;
-        while (all_valleys_vector[chunk_no][i+next_offset] == -2) {
-            next_offset++;
-        }
-
-        //for(int x = all_valleys_vector[chunk_no][i]; x < all_valleys_vector[chunk_no][i+next_offset]; x++) {
-                MainForm->SplitLineToWordsDetailed(all_valleys_vector[chunk_no][i], all_valleys_vector[chunk_no][i+next_offset], colour, values_to_write);
-            /*int valley = all_valleys_vector[chunk_no][i];
-            int start = chunk_no * chunk_size, end, image2_end;
-            if (chunk_no < 19)
-               end = start + chunk_size;
-            else  {
-                end = Ix;
-                end = Form1->Ix2;
-            }
-            for(int y = start; y < end; y++) {
-
-               if(IMAGE[x*Ix+y] == 0) {
-                    IMAGE[x*Ix+y] = values_to_write[x*Ix+y] = colour;
-                }
-             }
-
-            for(int y = start; y < end; y++) {
-                   IMAGE2[valley*Form1->Ix2+y] = valley_colour;
-            }*/
-
-        //}
-        //colour++;                                                                           
-    }
-    }
-
+   
     
     FILE *fp = fopen(output.c_str(), "wb+");
     for(int y = 0; y < Iy; y++) {
