@@ -1166,9 +1166,9 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
 
                         }
 
-                        for(int y = start; y < end; y++) {
+                        /*for(int y = start; y < end; y++) {
                             IMAGE[valley*Form1->Ix2+y] = valley_colour;
-                        }
+                        }*/
 
                 }
                 colour++;
@@ -1178,7 +1178,7 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
            for(int x = all_valleys_vector[chunk_no][all_valleys_vector[chunk_no].size()-1]; x < Iy; x++) {
                    int valley = all_valleys_vector[chunk_no][all_valleys_vector[chunk_no].size()-1];
                    int start = chunk_no * chunk_size, end, image2_end;
-                        
+
                         if (chunk_no < 19)
                            end = start + chunk_size;
                         else  {
@@ -1192,9 +1192,9 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
 
                         }
 
-                        for(int y = start; y < end; y++) {
+                        /*for(int y = start; y < end; y++) {
                             IMAGE[valley*Form1->Ix2+y] = valley_colour;
-                        }
+                        }*/
            }
         }
 
