@@ -1019,6 +1019,7 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
 
         int current_chunk_pos = 0;
         for(vector<int>::iterator i = all_valleys_vector[chunk_no].begin(); i != all_valleys_vector[chunk_no].end();) {
+            int current_valley = *i;
             int min = Iy, min_pos = -1;
 
             int pos = 0;
@@ -1034,7 +1035,7 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
             }
 
             int previous_valley = all_valleys_vector[chunk_no-1][min_pos];
-            int current_valley = *i;
+            
             // Check previous chunk closest valley is already connected
             int contains_index = -1;
             for (int counter = 0; counter < already_used_valleys.size(); counter++) {
@@ -1050,42 +1051,42 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
                connected_to_used_valleys.push_back(current_chunk_pos);                     // store current valley position
                mins_vector.push_back(min);                                                 // store min
                i++;
+               current_chunk_pos++;
             }
             
             // if already connected -> Check if we need to update and reject the previous current chunk closest valley or this one
            else {
                 if (mins_vector[contains_index] <= min) {
                    i = all_valleys_vector[chunk_no].erase(i);
-                   //all_valleys_vector[chunk_no][current_chunk_pos] = -2;
-                   //i++;
                 }
                 else {
                    all_valleys_vector[chunk_no].erase(all_valleys_vector[chunk_no].begin() + connected_to_used_valleys[contains_index]);
-                   current_chunk_pos--;
-                   connected_to_used_valleys[contains_index] = current_chunk_pos;
+                   
+                   connected_to_used_valleys[contains_index] = current_chunk_pos - 1;
                    mins_vector[contains_index] = min;
+                   i = all_valleys_vector[chunk_no].begin() + current_chunk_pos;
 
-                   i = all_valleys_vector[chunk_no].begin() + current_chunk_pos +1;
                 }
             }
             int modified_size = all_valleys_vector[chunk_no].size();
             int already_used_size = already_used_valleys.size();
-            int previous_valleys[15], current_valleys[15], used_valleys[15];
-            for (int z = 0; z < 15; z++)
+            int previous_valleys[20], current_valleys[20], used_valleys[20];
+            for (int z = 0; z < 20; z++)
                  previous_valleys[z] = -1;
             for (int z = 0; z < all_valleys_vector[chunk_no-1].size(); z++)
                 previous_valleys[z] = all_valleys_vector[chunk_no-1][z];
-             for (int z = 0; z < 15; z++)
+             for (int z = 0; z < 20; z++)
              current_valleys[z] = -1;
             for (int z = 0; z < all_valleys_vector[chunk_no].size(); z++)
                 current_valleys[z] = all_valleys_vector[chunk_no][z];
-            for (int z = 0; z < 15; z++)
+            for (int z = 0; z < 20; z++)
                 used_valleys[z] = -1;
             for (int z = 0; z < already_used_valleys.size(); z++)
                 used_valleys[z] = already_used_valleys[z];
-            current_chunk_pos++;
+
         }
 
+        int previous_valleys[20], current_valleys[20], used_valleys[20];
         // This part expands unconnected valleys from the previous chunk to the current one 
         for (int counter = 0; counter < all_valleys_vector[chunk_no-1].size(); counter++) {
             if(all_valleys_vector[chunk_no-1][counter] < 0)
@@ -1120,7 +1121,14 @@ void __fastcall TMainForm::SplitLinesNewClick(TObject *Sender)
                    all_valleys_vector[chunk_no].push_back(all_valleys_vector[chunk_no-1][counter]);
                }
             }
+
+
         }
+
+        for (int z = 0; z < 20; z++)
+             current_valleys[z] = -1;
+            for (int z = 0; z < all_valleys_vector[chunk_no].size(); z++)
+                current_valleys[z] = all_valleys_vector[chunk_no][z];
         int previous_size = all_valleys_vector[chunk_no-1].size();
         int current_size =  all_valleys_vector[chunk_no].size();
         assert (all_valleys_vector[chunk_no-1].size() == all_valleys_vector[chunk_no].size());
