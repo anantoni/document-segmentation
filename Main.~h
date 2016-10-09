@@ -56,14 +56,16 @@ class TMainForm : public TForm
     void __fastcall LinesDetailedClick(TObject *Sender);
     void __fastcall WordsDetailedClick(TObject *Sender);
     void __fastcall SplitWordsNewClick(TObject *Sender);
+    void __fastcall SplitWordsNewBatchClick(TObject *Sender);
     private:	// User declarations
     int Ix, Iy;
     unsigned char *IMAGE;
     long offs;
     AnsiString text;
     AnsiString output;
-    void SplitLineToWords(int ys,int ye,int& tag,int *values);
-    void SplitLineToWordsDetailed(int ys,int ye,int& tag,int *values);
+    void SplitLineToWords(int ys, int ye, int& label, int *values);
+    void SplitChunkToWords(int ys, int ye, int xs, int xe, int& label, int *values);
+    void SplitLineToWordsDetailed(int ys, int ye, int& label, int *values);
     public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);
 };
