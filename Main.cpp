@@ -100,7 +100,7 @@ void __fastcall TMainForm::LinesClick(TObject *Sender) {
     }
 
     int *horizontal_histogram;
-    int y_valley_threshold = StrToFloat(yAxisValleyHeightThreshold->Text);
+    float y_valley_threshold = StrToFloat(yAxisValleyHeightThreshold->Text);
 
     if ((horizontal_histogram = new int[Iy]) == NULL ) {
         cerr << "Error in y histogram allocation" << endl;
@@ -117,7 +117,7 @@ void __fastcall TMainForm::LinesClick(TObject *Sender) {
         }
     }
 
-    int line_width_threshold = StrToFloat(yAxisLineWidthThreshold->Text);
+    float line_width_threshold = StrToFloat(yAxisLineWidthThreshold->Text);
 
     for(int y = 0; y < Iy; y++) {
         float line_pixel_threshold = (float)((line_width_threshold*Ix)/100.0);
@@ -556,7 +556,7 @@ void __fastcall TMainForm::WordsDetailedClick(TObject *Sender)
 
     for(int i = 0; i < Form1->Iy2; i++) {
         if (horizontal_histogram[i] > 0)
-        for(int j = 0; j < 50; j++)
+        for(int j = 0; j < 10; j++)
         IMAGE2[i* Form1->Ix2 + j] = 100;
     }
 
@@ -617,8 +617,7 @@ void __fastcall TMainForm::WordsDetailedClick(TObject *Sender)
 void TMainForm::SplitLineToWords(int ys, int ye, int& colour, int* values_to_write) {
 
     int *vertical_histogram = new int[Ix];
-    long sum = 0, count = 0;
-    int x_axis_threshold;
+    float x_axis_threshold;
 
     unsigned char *IMAGE = &this->IMAGE[offs];
     for(int x = 0; x < Ix; x++) {
@@ -636,7 +635,7 @@ void TMainForm::SplitLineToWords(int ys, int ye, int& colour, int* values_to_wri
         vertical_histogram[x] = vertical_histogram[x] >= column_pixel_threshold;
     }
     //x-axis cuts
-    int x_valley_threshold = StrToFloat(xAxisValleyWidthThreshold->Text);
+    float x_valley_threshold = StrToFloat(xAxisValleyWidthThreshold->Text);
     std::vector<int> x_cuts;
 
     vector<int> vertical_cuts, vertical_cut_kinds;
@@ -677,7 +676,7 @@ void TMainForm::SplitLineToWordsDetailed(int ys, int ye, int& colour, int* value
 
     int *vertical_histogram = new int[Ix];
     long sum = 0, count = 0;
-    int x_axis_threshold;
+    float x_axis_threshold;
 
     for(int x = 0; x < Ix; x++) {
         vertical_histogram[x] = 0;
@@ -692,11 +691,11 @@ void TMainForm::SplitLineToWordsDetailed(int ys, int ye, int& colour, int* value
     unsigned char *IMAGE1 = &Form1->IMAGE1[Form1->offs1];
     unsigned char *IMAGE2 = &Form1->IMAGE2[Form1->offs2];
 
-    for (int i = 0; i < Form1->Ix1; i++) {
-        for (int j = 0; j < vertical_histogram[i]; j++)
-        if (IMAGE1[i+ j * Form1->Ix1] != 0)
-        IMAGE1[i + j * Form1->Ix1] = 50;
-    }
+    /*for(int i = 210; i < Form1->Ix1; i++) {
+        for(int j = 0; j < vertical_histogram[i-210]; j++)
+            if(IMAGE1[i+ j * Form1->Ix1] != 0)
+                IMAGE1[i + ys*Form1->Ix1 + j * Form1->Ix1] = 100;
+    }*/
 
 
     x_axis_threshold = StrToFloat(xAxisLineHeightThreshold->Text);
@@ -705,14 +704,14 @@ void TMainForm::SplitLineToWordsDetailed(int ys, int ye, int& colour, int* value
         vertical_histogram[x] = vertical_histogram[x] >= column_pixel_threshold;
     }
 
-    for(int i = 0; i < Form1->Ix2; i++) {
-        if (vertical_histogram[i] > 0)
-        for(int j = 0; j < 50; j++)
-        IMAGE2[i + j* Form1->Ix2] = 100;
-    }
+    /*for(int i = 210; i < Form1->Ix2; i++) {
+        if (vertical_histogram[i-210] > 0)
+        for(int j = 0; j < 10; j++)
+        IMAGE2[i + ys*Form1->Ix2 + j* Form1->Ix2] = 100;
+    }*/
 
     //x-axis cuts
-    int x_valley_threshold = StrToFloat(xAxisValleyWidthThreshold->Text);
+    float x_valley_threshold = StrToFloat(xAxisValleyWidthThreshold->Text);
     std::vector<int> x_cuts;
 
     vector<int> vertical_cuts, vertical_cut_kinds;
@@ -739,9 +738,7 @@ void TMainForm::SplitLineToWordsDetailed(int ys, int ye, int& colour, int* value
     for(int i = 0; i < vertical_cuts.size()-1; i++) {
         for(int x = vertical_cuts[i]; x < vertical_cuts[i+1]; x++) {
             for(int y = ys; y < ye; y++) {
-                if(IMAGE2[y*Form1->Ix2+x] != 0 && IMAGE2[y*Form1->Ix2+x] != 100) {
-                    IMAGE2[y*Form1->Ix2+x] = colour;
-                }
+               
                 if(IMAGE[y*Ix+x] == 0) {
                     IMAGE[y*Ix+x] = values_to_write[y*Ix+x] = colour;
                 }
@@ -1341,9 +1338,9 @@ void __fastcall TMainForm::SplitWordsNewClick(TObject *Sender)
             int start = chunk_no * chunk_size, end;
 
             if (chunk_no < 19)
-            end = start + chunk_size - 1;
+               end = start + chunk_size - 1;
             else
-            end = Ix;
+                end = Ix;
 
             for (int j = start; j < end; j++) {
                 if (IMAGE[i * Ix + j] == 0)
@@ -1352,16 +1349,6 @@ void __fastcall TMainForm::SplitWordsNewClick(TObject *Sender)
         }
     }
 
-
-
-    for (int i = 0; i < 20; i++) {
-        for (int j = 0; j < Form1->Iy1; j++) {
-            for (int index = i*chunk_size; index < i*chunk_size+horizontal_histogram[i][j]; index++) {
-                IMAGE1[j*Ix + index] = 50;
-            }
-
-        }
-    }
     int* smoothed_projection_profiles;
     if ((smoothed_projection_profiles = new int[Iy]) == NULL ) {
         cerr << "Error in y histogram allocation" << endl;
@@ -1369,11 +1356,11 @@ void __fastcall TMainForm::SplitWordsNewClick(TObject *Sender)
     }
 
     for (int i = 0; i < Iy; i++)
-    for (int j = 0; j < 20; j++)
-    smoothed_projection_profiles[i] += horizontal_histogram[j][i];
+        for (int j = 0; j < 20; j++)
+            smoothed_projection_profiles[i] += horizontal_histogram[j][i];
 
     float line_width_threshold = StrToFloat(yAxisLineWidthThreshold->Text);
-    float line_pixel_threshold = (line_width_threshold*Ix)/100.0;
+    float line_pixel_threshold = (float)(line_width_threshold*Ix)/100.0;
     for(int y = 0; y < Iy; y++) {
         smoothed_projection_profiles[y] = (smoothed_projection_profiles[y] >= line_pixel_threshold);
     }
@@ -1382,16 +1369,16 @@ void __fastcall TMainForm::SplitWordsNewClick(TObject *Sender)
     vector<int> peak_vector, valley_vector;
     int i = 0;
     while (i < Iy) {
-        while (i < Iy && smoothed_projection_profiles[i] == 1)
+        while (i < Iy && smoothed_projection_profiles[i] > 0)
         i++;
-        int peak = i-1;
+        int peak = i;
 
         while (i < Iy && smoothed_projection_profiles[i] == 0)
         i++;
-        int valley = i-1;
+        int valley = i;
         int midean = peak + (valley - peak)/2;
-
-            if (valley - peak >= (float)y_valley_threshold*Iy/100.0) {
+          
+            if (valley - peak >= (float)(y_valley_threshold*Iy/100.0)) {
                 valley_vector.push_back(midean);
             }
         
@@ -1406,15 +1393,9 @@ void __fastcall TMainForm::SplitWordsNewClick(TObject *Sender)
             horizontal_histogram[x][y] = (horizontal_histogram[x][y] >= line_pixel_threshold/20.0);
         }
     }
-    /**
-    *   New way to use all_valleys_vector
-    **/
+ 
     vector<int> *all_valleys_vector = new vector<int>[20];
-    /*for (int i = 0; i < Iy; i++) {
-    if (smoothed_projection_profiles[i] == 1)
-    for (int j = 0; j < 50; j++)
-    IMAGE[i* Ix + j] = 0;
-}*/
+
 
 
 for (int j = 0; j < valley_vector.size(); j++)
@@ -1504,7 +1485,7 @@ for (int chunk_no = 1; chunk_no < 20; chunk_no++) {
 
             }
         }
-        int modified_size = all_valleys_vector[chunk_no].size();
+        /*int modified_size = all_valleys_vector[chunk_no].size();
         int already_used_size = already_used_valleys.size();
         int previous_valleys[20], current_valleys[20], used_valleys[20];
         for (int z = 0; z < 20; z++)
@@ -1518,7 +1499,7 @@ for (int chunk_no = 1; chunk_no < 20; chunk_no++) {
         for (int z = 0; z < 20; z++)
         used_valleys[z] = -1;
         for (int z = 0; z < already_used_valleys.size(); z++)
-        used_valleys[z] = already_used_valleys[z];
+        used_valleys[z] = already_used_valleys[z];*/
 
     }
 
@@ -1561,30 +1542,23 @@ for (int chunk_no = 1; chunk_no < 20; chunk_no++) {
 
     }
 
-    for (int z = 0; z < 20; z++)
+    /*for (int z = 0; z < 20; z++)
     current_valleys[z] = -1;
     for (int z = 0; z < all_valleys_vector[chunk_no].size(); z++)
     current_valleys[z] = all_valleys_vector[chunk_no][z];
     int previous_size = all_valleys_vector[chunk_no-1].size();
-    int current_size =  all_valleys_vector[chunk_no].size();
+    int current_size =  all_valleys_vector[chunk_no].size();*/
     assert (all_valleys_vector[chunk_no-1].size() == all_valleys_vector[chunk_no].size());
 }
 
 int *vertical_histogram = new int[Ix];
-int x_axis_threshold;
-
-x_axis_threshold = StrToFloat(xAxisLineHeightThreshold->Text);
+float x_axis_threshold = StrToFloat(xAxisLineHeightThreshold->Text);
 float column_pixel_threshold = (float)(x_axis_threshold * Iy)/100.0;
-for(int x = 0; x < Ix; x++) {
-    vertical_histogram[x] = vertical_histogram[x] >= column_pixel_threshold;
-}
+
 //x-axis cuts
-int x_valley_threshold = StrToFloat(xAxisValleyWidthThreshold->Text);
+float x_valley_threshold = StrToFloat(xAxisValleyWidthThreshold->Text);
 
-vector<int> vertical_cuts, vertical_cut_kinds;
-
-
-
+vector<int> vertical_cuts;
 
 int colour = 1;
 for(int i = 0; i < all_valleys_vector[0].size() - 1; i++) {
@@ -1607,23 +1581,31 @@ for(int i = 0; i < all_valleys_vector[0].size() - 1; i++) {
 
         for(int x = start; x < end; x++) {
             vertical_histogram[x] = 0;
-            if (x >= 1926)
-                bool nai = true;
 
             for(int y = ys; y < ye; y++) {
-                    if (y >= 2281)
-               bool nai = true;
                 if(IMAGE[y*Ix+x] == 0)
                     vertical_histogram[x]++;
             }
         }
+
     }
 
-    x_axis_threshold = StrToFloat(xAxisLineHeightThreshold->Text);
-    float column_pixel_threshold = (float)(x_axis_threshold * Iy)/100.0;
+    /*for(int l = 0; l < Form1->Ix1; l++) {
+        if (vertical_histogram[l] > 0)
+           for(int j = 0; j < vertical_histogram[l]; j++) {
+                   IMAGE1[l + all_valleys_vector[0][i]*Form1->Ix1 + j* Form1->Ix1] = 100;
+           }
+    }*/
     for(int x = 0; x < Ix; x++) {
-        vertical_histogram[x] = vertical_histogram[x] >= column_pixel_threshold;
+        vertical_histogram[x] = (vertical_histogram[x] >= column_pixel_threshold);
     }
+
+    /*for(int l = 0;  l < Form1->Ix2; l++) {
+        if (vertical_histogram[l] > 0)
+           for(int j = 0; j < 10; j++)
+                   IMAGE2[l + all_valleys_vector[0][i]*Form1->Ix2 + j* Form1->Ix2] = 100;
+    }*/
+
     //x-axis cuts
     int x_valley_threshold = StrToFloat(xAxisValleyWidthThreshold->Text);
     std::vector<int> x_cuts;
@@ -1632,16 +1614,17 @@ for(int i = 0; i < all_valleys_vector[0].size() - 1; i++) {
 
     int x = 0;
     while (x < Ix) {
-        while (x < Ix && vertical_histogram[x] != 0)
+        while (x < Ix && vertical_histogram[x] > 0)
         x++;
-        int black_valley = x;
+        int black_valley = x-1;
 
         while (x < Ix && vertical_histogram[x] == 0)
         x++;
-        int white_valley = x;
+        int white_valley = x-1;
 
         int midean = black_valley + (white_valley - black_valley)/2;
-        if (white_valley - black_valley >= (float)(x_valley_threshold * Iy)/100.0) {
+        float valley_threshold = x_valley_threshold * Iy/100.0;
+        if (white_valley - black_valley >= valley_threshold) {
             vertical_cuts.push_back(midean);
         }
     }
@@ -1667,15 +1650,16 @@ for(int i = 0; i < all_valleys_vector[0].size() - 1; i++) {
         }
         for(int x = start; x < end; x++) {
             for(int y = all_valleys_vector[chunk_no][i]; y < all_valleys_vector[chunk_no][i+1]; y++) {
-                if(vertical_cut_counter < vertical_cuts.size()-1 && x > vertical_cuts[vertical_cut_counter] && x < vertical_cuts[vertical_cut_counter+1])
-                if(IMAGE[y*Ix+x] == 0)
-                IMAGE[y*Ix+x] = values_to_write[y*Ix+x] = colour;
+                if(vertical_cut_counter == vertical_cuts.size() - 1 || (vertical_cut_counter < vertical_cuts.size()-1 && x > vertical_cuts[vertical_cut_counter] && x < vertical_cuts[vertical_cut_counter+1]))
+                    if(IMAGE[y*Ix+x] == 0)
+                        IMAGE[y*Ix+x] = values_to_write[y*Ix+x] = colour;
 
-                if(vertical_cut_counter < vertical_cuts.size()-1 && x == vertical_cuts[vertical_cut_counter+1]) {
+                if(vertical_cut_counter < vertical_cuts.size() - 1 && x == vertical_cuts[vertical_cut_counter+1]) {
                     vertical_cut_counter++;
                     colour++;
                 }
-
+                if(x == Ix - 1)
+                     colour++;
             }
         }
     }
@@ -1707,7 +1691,7 @@ Form1->ImagXpress7_1->LoadBuffer((long) Form1->IMAGE1);
 
 
 Form1->ImagXpress7_2->DIBUpdate();
-Form1->ImagXpress7_2->LoadBuffer((long) Form1->IMAGE2);  */
+Form1->ImagXpress7_2->LoadBuffer((long) Form1->IMAGE2);*/
 delete[] IMAGE;
 delete[] IMAGE1;
 delete[] IMAGE2;
